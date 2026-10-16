@@ -1,0 +1,19 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name=".AdaptiveNavigationPreviewActivity"
+            android:exported="true"
+            android:label="Adaptive navigation preview" />
+        <receiver
+            android:name=".migration.MigrationValidationReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.aesprt.aquahub.DEBUG_SET_MIRROR_FAILURE" />
+                <action android:name="com.aesprt.aquahub.DEBUG_CREATE_CUSTOMER" />
+                <action android:name="com.aesprt.aquahub.DEBUG_UPDATE_CUSTOMER" />
+                <action android:name="com.aesprt.aquahub.DEBUG_ARCHIVE_CUSTOMER" />
+                <action android:name="com.aesprt.aquahub.DEBUG_SYNC_NOW" />
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>

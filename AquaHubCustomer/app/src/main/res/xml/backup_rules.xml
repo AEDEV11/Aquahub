@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Customer profile and address data must not move to another install. -->
+    <exclude domain="database" path="aquahub_customer.db" />
+    <!-- Preferences DataStore stores its protobuf under files/datastore. -->
+    <exclude domain="file" path="datastore/aquahub_customer_preferences.preferences_pb" />
+</full-backup-content>
