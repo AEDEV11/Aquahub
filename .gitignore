@@ -1,0 +1,54 @@
+# Local environment files and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.*.example
+
+# Android and Gradle outputs
+.gradle/
+**/build/
+**/.kotlin/
+**/.cxx/
+**/.externalNativeBuild/
+**/captures/
+local.properties
+**/local.properties
+
+# Android Studio and IntelliJ
+.idea/
+**/.idea/
+*.iml
+
+# Firebase configuration and local emulator data
+**/google-services.json
+**/GoogleService-Info.plist
+**/.firebase/
+**/firebase-debug.log
+**/firestore-debug.log
+**/ui-debug.log
+
+# Node.js and package manager output
+**/node_modules/
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# Supabase local state
+supabase/.temp/
+
+# Signing credentials and packaged build artifacts
+**/*.jks
+**/*.keystore
+**/*.p12
+**/*.mobileprovision
+**/*.apk
+**/*.aab
+
+# Operating system files
+.DS_Store
+Thumbs.db

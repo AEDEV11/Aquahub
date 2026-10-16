@@ -1,0 +1,33 @@
+{
+  "environment": "NONPRODUCTION",
+  "verifiedAt": null,
+  "owner": {
+    "gitRevision": "REPLACE_WITH_VERIFIED_COMMIT",
+    "applicationId": "com.aesprt.aquahub",
+    "versionCode": null,
+    "versionName": null
+  },
+  "customer": {
+    "gitRevision": "REPLACE_WITH_VERIFIED_COMMIT",
+    "applicationId": "com.aesprt.aquahub_customer",
+    "versionCode": null,
+    "versionName": null
+  },
+  "backend": {
+    "gitRevision": "REPLACE_WITH_VERIFIED_COMMIT",
+    "migrationHead": null,
+    "migrationChecksums": [],
+    "edgeFunctions": {}
+  },
+  "database": {
+    "environmentLabel": "NONPRODUCTION",
+    "projectReference": "REDACTED_OR_NONPRODUCTION_REFERENCE"
+  },
+  "verification": {
+    "localSql": null,
+    "stagingRestJwt": null,
+    "ownerDevice": null,
+    "customerDevice": null,
+    "playLicensedPurchase": null
+  }
+}

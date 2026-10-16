@@ -1,0 +1,5 @@
+order-app/node_modules/
+order/
+order-app/.env
+order-app/.env.*
+!order-app/.env.*.example

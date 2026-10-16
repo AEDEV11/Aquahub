@@ -1,0 +1,47 @@
+# Supabase
+.branches
+.temp
+.supabase
+
+# Secrets and local environment configuration. Keep only inert examples tracked.
+.env
+.env.*
+!.env.example
+!**/.env.*.example
+functions/.env
+functions/.env.*
+!functions/.env.*.example
+.env.keys
+.env.local
+.env.*.local
+
+# Credentials, local data exports, and generated artifacts
+*service-account*.json
+*service_account*.json
+*.pem
+*.p12
+*.key
+*.sql.gz
+*.dump
+*.backup
+*.log
+*.apk
+*.aab
+*.jks
+*.keystore
+google-services.json
+GoogleService-Info.plist
+backups/
+db-dumps/
+coverage/
+dist/
+target/
+node_modules/
+
+# dotenvx
+.env.keys
+.env.local
+.env.*.local
+functions/.env
+functions/.env.*
+!functions/.env.*.example

@@ -1,0 +1,19 @@
+{
+  "name": "aquahub-web-ordering",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "build:staging": "vite build --mode staging",
+    "preview": "vite preview",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2"
+  },
+  "devDependencies": {
+    "vite": "8.3.2"
+  }
+}

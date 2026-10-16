@@ -1,0 +1,96 @@
+create table public.orders (
+  id uuid primary key default gen_random_uuid(),
+  firebase_id text unique,
+  client_operation_id text unique,
+  station_id uuid not null references public.stations(id) on delete restrict,
+  customer_id uuid references public.customers(id) on delete set null,
+  customer_uid uuid references public.profiles(id) on delete set null,
+  order_number text not null,
+  customer_name text not null,
+  customer_phone text not null default '',
+  rider_id uuid references public.riders(id) on delete set null,
+  delivery_address_id uuid references public.customer_addresses(id) on delete set null,
+  delivery_address text not null default '',
+  delivery_place_id text,
+  delivery_latitude double precision,
+  delivery_longitude double precision,
+  delivery_mode public.delivery_mode not null default 'DELIVERY',
+  subtotal_centavos bigint not null check (subtotal_centavos >= 0),
+  delivery_fee_centavos bigint not null default 0 check (delivery_fee_centavos >= 0),
+  discount_centavos bigint not null default 0 check (discount_centavos >= 0),
+  total_centavos bigint not null check (total_centavos >= 0),
+  payment_method text not null,
+  payment_status text not null default 'PENDING',
+  status public.order_status not null default 'PENDING',
+  scheduled_delivery_start bigint,
+  scheduled_delivery_end bigint,
+  customer_note text,
+  station_note text,
+  rejection_reason text,
+  requested_at bigint,
+  accepted_at bigint,
+  ready_at bigint,
+  assigned_at bigint,
+  out_for_delivery_at bigint,
+  delivered_at bigint,
+  completed_at bigint,
+  cancelled_at bigint,
+  order_version integer not null default 1,
+  client_updated_at bigint,
+  deleted_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  check ((delivery_latitude is null) = (delivery_longitude is null)),
+  check (delivery_mode = 'PICKUP' or delivery_address <> '')
+);
+
+create table public.order_items (
+  id uuid primary key default gen_random_uuid(),
+  firebase_id text unique,
+  order_id uuid not null references public.orders(id) on delete cascade,
+  product_id uuid references public.products(id) on delete set null,
+  product_name_snapshot text not null,
+  product_type_snapshot text not null,
+  size_label_snapshot text not null,
+  unit_price_centavos bigint not null check (unit_price_centavos >= 0),
+  quantity integer not null check (quantity between 1 and 99),
+  subtotal_centavos bigint not null check (subtotal_centavos >= 0),
+  created_at timestamptz not null default now()
+);
+
+alter table public.container_movements add constraint container_movements_order_fk foreign key (order_id) references public.orders(id) on delete set null;
+
+create table public.payments (
+  id uuid primary key default gen_random_uuid(),
+  firebase_id text unique,
+  station_id uuid not null references public.stations(id) on delete restrict,
+  order_id uuid not null references public.orders(id) on delete cascade,
+  payment_method text not null,
+  amount_centavos bigint not null check (amount_centavos > 0),
+  status text not null,
+  reference_number text,
+  created_at timestamptz not null default now(),
+  paid_at timestamptz,
+  client_updated_at bigint,
+  deleted_at timestamptz
+);
+
+create table public.expenses (
+  id uuid primary key default gen_random_uuid(),
+  firebase_id text unique,
+  station_id uuid not null references public.stations(id) on delete restrict,
+  amount_centavos bigint not null check (amount_centavos > 0),
+  category text not null,
+  description text not null,
+  vendor text,
+  payment_method text not null,
+  reference_number text,
+  notes text,
+  incurred_at bigint not null,
+  is_active boolean not null default true,
+  client_updated_at bigint,
+  deleted_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+

@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <base href="/" />
+  <meta name="theme-color" content="#1264E6" />
+  <meta name="description"
+    content="Manage a Philippine water-refilling station with AquaHub Owner. See how participating stations can offer browser-based mobile ordering, with no customer app download required." />
+  <title>AquaHub | Water Station Management &amp; Mobile Ordering</title>
+  <link rel="canonical" href="https://aquahub.aesprt.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AquaHub" />
+  <meta property="og:title" content="AquaHub | Water Station Management &amp; Mobile Ordering" />
+  <meta property="og:description"
+    content="Manage station operations with AquaHub Owner and explore browser-based mobile ordering for participating stations." />
+  <meta property="og:url" content="https://aquahub.aesprt.com/" />
+  <meta property="og:image" content="https://aquahub.aesprt.com/assets/aquahub-icon-512.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AquaHub | Water Station Management &amp; Mobile Ordering" />
+  <meta name="twitter:description"
+    content="Manage station operations with AquaHub Owner and explore browser-based mobile ordering for participating stations." />
+  <meta name="twitter:image" content="https://aquahub.aesprt.com/assets/aquahub-icon-512.png" />
+  <link rel="icon" href="assets/favicon-64.png?v=20260927-white-icon" type="image/png" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "AquaHub",
+      "url": "https://aquahub.aesprt.com/"
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="preload" as="image" href="assets/landing/station-hero.webp" />
+  <link rel="stylesheet" href="styles.css?v=20261010-website-update" />
+  <link rel="stylesheet" href="landing.css?v=20261010-redesign" />
+</head>
+
+<body class="home-page">
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Header -->
+  <header class="site-header" data-header>
+    <div class="container nav-wrap">
+      <a class="brand" href="index.html" aria-label="AquaHub Home">
+        <img src="assets/aquahub-logo.png" alt="AquaHub Logo" width="32" height="32" />
+        <span>AquaHub</span>
+      </a>
+
+      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-expanded="false"
+        aria-controls="site-nav" data-menu-toggle>
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary navigation" data-nav>
+        <a href="#solutions">Why AquaHub</a>
+        <a href="#story">How It Works</a>
+        <a href="#owner-app">Owner App</a>
+        <a href="#mobile-ordering">Mobile Ordering</a>
+        <a href="#features">Features</a>
+        <a href="#pricing">Plans</a>
+        <a href="#faq">FAQ</a>
+        <a class="nav-cta" href="#get-owner">Get Owner App</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="home-hero" id="top" aria-labelledby="hero-title" data-hero-scene>
+      <div class="home-hero-glow" aria-hidden="true"></div>
+      <canvas class="home-water-canvas" data-water-canvas aria-hidden="true"></canvas>
+      <div class="container home-hero-grid">
+        <div class="home-hero-copy">
+          <p class="home-eyebrow"><span class="home-eyebrow-line" aria-hidden="true"></span> Built for Philippine water refilling stations</p>
+          <h1 id="hero-title">Every refill runs better when <em>everything flows.</em></h1>
+          <p class="home-hero-lead">AquaHub Owner brings walk-in sales, orders, stock, customers, and daily station work into one clear view. Give your team room to focus on the service behind every gallon.</p>
+          <div class="home-hero-actions">
+            <button class="home-action home-action-primary is-unavailable" type="button" data-owner-play-cta disabled><span>Get Owner App on Google Play</span></button>
+            <a class="home-action home-action-secondary" href="#story">See how it works <span aria-hidden="true">↓</span></a>
+          </div>
+          <p class="owner-availability" id="hero-owner-availability"><span class="availability-dot" aria-hidden="true"></span><strong>Closed testing.</strong> Owner access is currently limited to approved testers. <a href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Owner%20closed%20testing%20access%20request" data-email-link data-email-subject="AquaHub Owner closed testing access request">Ask for tester access</a>.</p>
+          <ul class="home-hero-facts" aria-label="AquaHub highlights">
+            <li>Local-first Owner workflows</li>
+            <li>Plan-based station tools</li>
+            <li>Browser ordering when enabled</li>
+          </ul>
+        </div>
+        <div class="home-hero-visual" aria-hidden="true">
+          <div class="hero-orbit hero-orbit-one"></div>
+          <div class="hero-orbit hero-orbit-two"></div>
+          <div class="hero-light-beam"></div>
+          <div class="hero-scene-floor"></div>
+          <img class="hero-station-art" src="assets/landing/station-hero.webp" width="1536" height="1024" fetchpriority="high" decoding="async" alt="" />
+          <div class="hero-dashboard">
+            <span class="hero-dashboard-label">ILLUSTRATIVE OWNER VIEW</span>
+            <strong>Station at a glance</strong>
+            <div class="hero-dashboard-grid"><span>Orders <b>18</b></span><span>Stock alerts <b>03</b></span></div>
+            <span class="hero-dashboard-rule"></span>
+            <span class="hero-dashboard-foot"><i></i> Local work ready</span>
+          </div>
+          <div class="hero-bubble hero-bubble-one"></div>
+          <div class="hero-bubble hero-bubble-two"></div>
+          <div class="hero-bubble hero-bubble-three"></div>
+        </div>
+      </div>
+      <div class="home-hero-bottom" aria-hidden="true"><span>SCROLL TO FOLLOW THE FLOW</span><span class="scroll-line"></span><span>01 / 05</span></div>
+      <svg class="hero-waterline" viewBox="0 0 1440 180" preserveAspectRatio="none" aria-hidden="true"><path class="hero-waterline-back" d="M0 95C190 36 328 148 555 96S889 27 1092 80s256 60 348 17v83H0Z"/><path class="hero-waterline-front" d="M0 111c170 55 325-54 520-20s308 88 518 24 305-36 402-2v67H0Z"/></svg>
+    </section>
+
+    <section class="home-why section" id="solutions" aria-labelledby="why-title">
+      <div class="container home-why-grid">
+        <div class="home-why-media" data-reveal>
+          <div class="why-photo-wrap"><img src="assets/landing/refill-station.jpg" alt="Illustration of a five-gallon container filling at a water refilling station" width="2048" height="2048" loading="lazy" decoding="async" /></div>
+          <div class="why-photo-caption"><span class="why-photo-index">01 / THE STATION</span><strong>Built around the work you already do.</strong></div>
+        </div>
+        <div class="home-why-copy">
+          <p class="home-kicker">WHY AQUAHUB</p>
+          <h2 id="why-title">One station. Many moving parts. <em>One clearer view.</em></h2>
+          <p>Behind every refill is a counter, a stockroom, a customer, and often a delivery. AquaHub Owner brings those practical jobs together without losing the station-first way your team works.</p>
+          <div class="why-lines">
+            <div><span>01</span><div><h3>Keep the counter moving</h3><p>Record walk-in sales and organize the orders your team needs to handle.</p></div></div>
+            <div><span>02</span><div><h3>Know what is ready</h3><p>Keep product and stock information close to daily decisions.</p></div></div>
+            <div><span>03</span><div><h3>See the whole day</h3><p>Review station activity and reports with tools available to your plan.</p></div></div>
+          </div>
+          <a class="home-text-link" href="#owner-app">Explore the Owner app <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </section>
+
+    <span class="anchor-alias" id="how-it-works" aria-hidden="true"></span>
+    <section class="home-story" id="story" aria-labelledby="story-title" data-scroll-story data-active-scene="0">
+      <div class="container">
+        <div class="home-story-heading"><p class="home-kicker">FOLLOW THE FLOW</p><h2 id="story-title">From the first refill to the next order.</h2><p>One connected view of the station day. Scroll to see how the work moves.</p></div>
+        <div class="home-story-layout">
+          <div class="home-story-stage" aria-hidden="true">
+            <div class="story-stage-grid"></div>
+            <img class="story-water-art" src="assets/landing/water-sculpture.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="" />
+            <div class="story-visual is-active" data-story-visual data-scene="0">
+              <span class="story-visual-tag">01 / REFILL</span>
+              <img class="story-station-art" src="assets/landing/station-hero.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="" />
+              <div class="story-scene-caption">Every operation begins at the station.</div>
+            </div>
+            <div class="story-visual" data-story-visual data-scene="1">
+              <span class="story-visual-tag">02 / OVERVIEW</span>
+              <div class="story-device story-device-dashboard"><div class="story-device-top"><span class="story-device-brand">AquaHub Owner</span><span>Station view</span></div><strong>Today's work, in view.</strong><div class="story-stat-row"><span>Orders <b>18</b></span><span>Stock alerts <b>03</b></span></div><div class="story-mini-bars"><i></i><i></i><i></i><i></i><i></i></div><small>Illustrative screen</small></div>
+            </div>
+            <div class="story-visual" data-story-visual data-scene="2">
+              <span class="story-visual-tag">03 / FULFILLMENT</span>
+              <div class="story-flow-cards"><div><span>WALK-IN</span><strong>Record the sale</strong><i></i></div><div><span>STOCK</span><strong>Check what is ready</strong><i></i></div><div><span>DELIVERY</span><strong>Organize dispatch</strong><i></i></div></div>
+            </div>
+            <div class="story-visual" data-story-visual data-scene="3">
+              <span class="story-visual-tag">04 / MOBILE ORDERING</span>
+              <div class="story-phone"><div class="story-phone-notch"></div><span class="story-phone-label">STATION LINK · BROWSER</span><strong>Your local water station</strong><p>Browse products and select available options.</p><div class="story-phone-product"><i></i><span>Refill choices<br><small>Published by the station</small></span></div><div class="story-phone-product"><i></i><span>Pickup or delivery<br><small>When offered</small></span></div><span class="story-phone-button">Continue</span></div>
+            </div>
+            <div class="story-stage-progress"><span></span></div>
+          </div>
+          <div class="home-story-steps">
+            <article class="story-step is-active" data-story-step data-scene="0"><span class="story-step-index">01 / THE REFILL</span><h3>A station built on service.</h3><p>The jug, the counter, and the team come first. AquaHub is designed for the daily rhythm of a Philippine water refilling station.</p></article>
+            <article class="story-step" data-story-step data-scene="1"><span class="story-step-index">02 / OWNER VIEW</span><h3>See what needs attention.</h3><p>AquaHub Owner puts orders, products, stock, customers, and reports within reach. Available tools depend on the selected plan.</p></article>
+            <article class="story-step" data-story-step data-scene="2"><span class="story-step-index">03 / FULFILLMENT</span><h3>Move the work forward.</h3><p>Record walk-in activity, manage eligible orders, and organize delivery workflows where the station's plan and setup support them.</p></article>
+            <article class="story-step" data-story-step data-scene="3"><span class="story-step-index">04 / CUSTOMER LINK</span><h3>Bring customers into the flow.</h3><p>When a participating station enables online ordering, customers use its mobile browser link to browse and submit an order. No Customer app download is needed.</p></article>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- Owner app screenshot showcase -->
+    <section class="section screenshot-section home-owner" id="owner-app">
+      <div class="container">
+        <div class="section-head center">
+          <span class="kicker">AQUAHUB OWNER APP</span>
+          <h2>The station, in the palm of your hand.</h2>
+          <p>Explore the real AquaHub Owner screens for dashboard, orders, inventory, customers, reports, and settings. Features depend on plan access.</p>
+        </div>
+        <div class="screenshot-carousel" data-screenshot-carousel aria-roledescription="carousel" aria-label="AquaHub Owner app screenshots">
+          <div class="carousel-stage">
+            <button class="carousel-arrow carousel-arrow-prev" type="button" data-carousel-prev aria-label="Previous Owner app screenshot">←</button>
+            <div class="carousel-viewport">
+              <div class="carousel-track" data-carousel-track>
+                <figure class="screenshot-slide is-active" data-slide="0" aria-hidden="false">
+                  <div class="screenshot-frame"><img src="assets/ss-owners/dashboard.webp" alt="AquaHub Owner dashboard showing station orders, revenue, quick actions, and recent orders" loading="lazy" /></div>
+                  <figcaption><span class="slide-index">01 / 06</span><strong>Dashboard — Kita agad ang buong station.</strong><span>Orders, revenue, plan status, quick actions, at recent activity sa isang malinaw na view.</span></figcaption>
+                </figure>
+                <figure class="screenshot-slide" data-slide="1" aria-hidden="true">
+                  <div class="screenshot-frame"><img src="assets/ss-owners/orders.webp" alt="AquaHub Owner orders screen showing delivery and pickup orders" loading="lazy" /></div>
+                  <figcaption><span class="slide-index">02 / 06</span><strong>Orders — Walang ligaw na order.</strong><span>Makita at i-manage ang delivery, pickup, walk-in, payment status, at order progress.</span></figcaption>
+                </figure>
+                <figure class="screenshot-slide" data-slide="2" aria-hidden="true">
+                  <div class="screenshot-frame"><img src="assets/ss-owners/inventory.webp" alt="AquaHub Owner inventory screen showing products, saleable stock, and containers" loading="lazy" /></div>
+                  <figcaption><span class="slide-index">03 / 06</span><strong>Inventory — Alam kung ano ang ready.</strong><span>Separate ang saleable product stock sa station-owned containers para mas accurate ang bilang.</span></figcaption>
+                </figure>
+                <figure class="screenshot-slide" data-slide="3" aria-hidden="true">
+                  <div class="screenshot-frame"><img src="assets/ss-owners/customer.webp" alt="AquaHub Owner customer management screen" loading="lazy" /></div>
+                  <figcaption><span class="slide-index">04 / 06</span><strong>Customers — Mas kilala ang regulars.</strong><span>Customer profiles, order history, balances, partial receipts, at statements sa isang place.</span></figcaption>
+                </figure>
+                <figure class="screenshot-slide" data-slide="4" aria-hidden="true">
+                  <div class="screenshot-frame"><img src="assets/ss-owners/reports.webp" alt="AquaHub Owner reports screen" loading="lazy" /></div>
+                  <figcaption><span class="slide-index">05 / 06</span><strong>Reports — Mas malinaw ang performance.</strong><span>Review cash-basis revenue, product performance, expenses kung enabled, at available exports.</span></figcaption>
+                </figure>
+                <figure class="screenshot-slide" data-slide="5" aria-hidden="true">
+                  <div class="screenshot-frame"><img src="assets/ss-owners/settings.webp" alt="AquaHub Owner settings screen" loading="lazy" /></div>
+                  <figcaption><span class="slide-index">06 / 06</span><strong>Settings — Kontrolado ang station setup.</strong><span>Station profile, payment methods, QR ordering, staff access, at operational preferences.</span></figcaption>
+                </figure>
+              </div>
+            </div>
+            <button class="carousel-arrow carousel-arrow-next" type="button" data-carousel-next aria-label="Next Owner app screenshot">→</button>
+          </div>
+          <div class="carousel-controls">
+            <div class="carousel-dots" role="group" aria-label="Choose an Owner app screenshot">
+              <button class="carousel-dot is-active" type="button" data-carousel-dot="0" aria-pressed="true" aria-label="Show Dashboard screenshot"></button>
+              <button class="carousel-dot" type="button" data-carousel-dot="1" aria-pressed="false" aria-label="Show Orders screenshot"></button>
+              <button class="carousel-dot" type="button" data-carousel-dot="2" aria-pressed="false" aria-label="Show Inventory screenshot"></button>
+              <button class="carousel-dot" type="button" data-carousel-dot="3" aria-pressed="false" aria-label="Show Customers screenshot"></button>
+              <button class="carousel-dot" type="button" data-carousel-dot="4" aria-pressed="false" aria-label="Show Reports screenshot"></button>
+              <button class="carousel-dot" type="button" data-carousel-dot="5" aria-pressed="false" aria-label="Show Settings screenshot"></button>
+            </div>
+            <span class="carousel-hint">Swipe, click, o gamitin ang arrow keys</span>
+          </div>
+        </div>
+        <div class="screenshot-note"><strong>Built para sa actual na station work.</strong><span>Owner features depend on plan access. Mobile ordering is available only when a station has an active ordering link.</span></div>
+      </div>
+    </section>
+
+    <section class="home-ordering section" id="mobile-ordering" aria-labelledby="ordering-title">
+      <div class="container home-ordering-grid">
+        <div class="home-ordering-copy">
+          <p class="home-kicker">THE CUSTOMER SIDE</p>
+          <h2 id="ordering-title">For customers, a station link is enough.</h2>
+          <p>Participating stations can share a mobile-friendly ordering link. Customers open it in a browser, see that station's published products, and choose only the options it offers.</p>
+          <ol class="ordering-journey">
+            <li><span>01</span><div><strong>Open the station link</strong><p>Scan its QR code or follow a link shared by the station.</p></div></li>
+            <li><span>02</span><div><strong>Browse and choose</strong><p>See published products and select pickup or delivery when available.</p></div></li>
+            <li><span>03</span><div><strong>Send to the station</strong><p>The station handles eligible submitted orders through AquaHub Owner.</p></div></li>
+          </ol>
+          <p class="ordering-availability-note">Browser ordering and checkout choices depend on the participating station's setup and active ordering link. No separate app download is required.</p>
+        </div>
+        <div class="home-ordering-visual" aria-hidden="true">
+          <div class="ordering-halo"></div>
+          <div class="ordering-wave"></div>
+          <div class="ordering-phone"><div class="ordering-phone-camera"></div><div class="ordering-phone-screen"><span class="ordering-phone-overline">STATION LINK · IN YOUR BROWSER</span><strong>Order from your station</strong><p>Browse the catalog published for this station.</p><div class="ordering-product"><span class="ordering-product-icon">◉</span><span>Water refill<small>Published by the station</small></span><span aria-hidden="true">↗</span></div><div class="ordering-product"><span class="ordering-product-icon">◉</span><span>Containers<small>When available</small></span><span aria-hidden="true">↗</span></div><span class="ordering-phone-cta">Choose available options</span></div></div>
+          <div class="ordering-floating-note"><span>NO EXTRA APP</span><strong>A simple mobile link.</strong></div>
+        </div>
+      </div>
+    </section>
+    <!-- Core Features Grid with Bespoke SVG Icons -->
+    <section class="section section-subtle home-features" id="features">
+      <div class="container">
+        <div class="section-head center">
+          <span class="kicker">AQUAHUB OWNER</span>
+          <h2>Tools for everyday station operations.</h2>
+          <p>Owner tools vary by plan. Browser-based customer ordering is available only where a station has an active ordering link.</p>
+        </div>
+
+        <div class="feature-grid">
+          <!-- Feature 1: POS & Orders -->
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="2" y="3" width="20" height="14" rx="2" />
+                <line x1="8" y1="21" x2="16" y2="21" />
+                <line x1="12" y1="17" x2="12" y2="21" />
+              </svg>
+            </div>
+            <h3>Orders at walk-in POS</h3>
+            <p>Record walk-in sales and organize station orders, with supported payment and customer-account workflows based on the Owner setup.</p>
+          </div>
+
+          <!-- Feature 2: Container Tracking -->
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6 2h12v4H6zM4 6h16v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
+                <path d="M10 10v6M14 10v6" />
+              </svg>
+            </div>
+            <h3>Products at stock</h3>
+            <p>Maintain products, prices, availability, and stock. Basic stock tools are available on Free; advanced tools depend on plan.</p>
+          </div>
+
+          <!-- Feature 3: Rider Logistics -->
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="10" r="3" />
+                <path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z" />
+              </svg>
+            </div>
+            <h3>Delivery dispatch</h3>
+            <p>Eligible plans include delivery management and rider assignment. Teams can open a delivery pin in Maps; live rider tracking and route planning are not included.</p>
+          </div>
+
+          <!-- Feature 4: Offline-First Engine -->
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M18.36 6.64a9 9 0 11-12.73 0" />
+                <line x1="12" y1="2" x2="12" y2="12" />
+              </svg>
+            </div>
+            <h3>Local-first operations</h3>
+            <p>Many Owner workflows remain available offline, with pending changes queued for synchronization when connectivity returns.</p>
+          </div>
+
+          <!-- Feature 5: Station-linked browser ordering -->
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <rect x="5" y="2" width="14" height="20" rx="2" />
+                <line x1="12" y1="18" x2="12.01" y2="18" />
+              </svg>
+            </div>
+            <h3>Station-linked ordering</h3>
+            <p>Customers can browse and submit an order in a mobile browser when a participating station has its online ordering link enabled. No separate app download is required.</p>
+          </div>
+
+          <!-- Feature 6: Reports & Exports -->
+          <div class="feature-box">
+            <div class="feature-icon-wrapper">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <line x1="18" y1="20" x2="18" y2="10" />
+                <line x1="12" y1="20" x2="12" y2="4" />
+                <line x1="6" y1="20" x2="6" y2="14" />
+              </svg>
+            </div>
+            <h3>Reports at exports</h3>
+            <p>Review sales and business summaries. Report details, expense tools, and exports vary by plan.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Owner plan pricing -->
+    <section class="section home-pricing" id="pricing">
+      <div class="container">
+        <div class="section-head center">
+          <span class="kicker">OWNER PLANS</span>
+          <h2>Choose the tools that fit your station.</h2>
+          <p>Compare the current AquaHub Owner plan catalogue. Features and limits are based on the selected plan.</p>
+        </div>
+
+        <fieldset class="billing-selector" data-billing-selector>
+          <legend>Billing frequency</legend>
+          <label class="billing-option">
+            <input type="radio" name="billing-cycle" value="monthly" checked />
+            <span>Monthly</span>
+          </label>
+          <label class="billing-option">
+            <input type="radio" name="billing-cycle" value="annual" />
+            <span>Annual</span>
+          </label>
+          <span class="annual-savings-label">Save 20% vs 12 monthly payments</span>
+        </fieldset>
+        <p class="billing-summary" data-billing-summary aria-live="polite">
+          Monthly amounts are shown. Annual billing, where offered, saves 20% compared with 12 monthly payments.
+        </p>
+
+        <div class="pricing-grid">
+          <!-- Free plan -->
+          <article class="pricing-card" data-pricing-card data-plan-key="free">
+            <div class="pricing-header">
+              <h3>Free</h3>
+              <p>Essential station tools for getting started.</p>
+              <div class="pricing-figure">
+                <data class="pricing-amount" data-price-amount value="0">₱0</data>
+                <span class="pricing-period" data-price-period>no charge</span>
+              </div>
+              <span class="pricing-daily" data-price-note>No annual billing</span>
+            </div>
+            <ul class="pricing-features">
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Hanggang 100 orders bawat buwan</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Walk-in POS and daily order records</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Customer directory and basic reports · up to 50 customers</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Basic stock tools · 1 station and up to 20 products</span>
+              </li>
+              <li class="feature-not-included"><span>Mobile ordering, rider management, and delivery dispatch are not included</span></li>
+            </ul>
+            <a class="pricing-btn" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Free%20plan%20access" data-email-link data-email-subject="AquaHub Free plan access">Ask about Free access</a>
+          </article>
+
+          <!-- Starter plan -->
+          <article class="pricing-card" data-pricing-card data-plan-key="starter">
+            <div class="pricing-header">
+              <h3>Starter</h3>
+              <p>Delivery tools and customer ordering for one station.</p>
+              <div class="pricing-figure">
+                <data class="pricing-amount" data-price-amount value="19900">₱199</data>
+                <span class="pricing-period" data-price-period>/ month</span>
+              </div>
+              <span class="pricing-daily" data-price-note>Billed monthly</span>
+            </div>
+            <ul class="pricing-features">
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Hanggang 300 orders bawat buwan</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Basic container tracking and CSV export</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Mobile ordering and delivery management when enabled for the station</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Up to 2 riders and 2 staff</span>
+              </li>
+              <li><span>1 station · up to 30 products, 300 orders, and 100 customers per month</span></li>
+            </ul>
+            <a class="pricing-btn" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Starter%20plan%20access" data-email-link data-email-subject="AquaHub Starter plan access">Ask about Starter access</a>
+          </article>
+
+          <!-- Business plan -->
+          <article class="pricing-card featured" data-pricing-card data-plan-key="business">
+            <span class="pricing-badge">Popular</span>
+            <div class="pricing-header">
+              <h3>Business</h3>
+              <p>More capacity and tools for a growing operation.</p>
+              <div class="pricing-figure">
+                <data class="pricing-amount" data-price-amount value="49900">₱499</data>
+                <span class="pricing-period" data-price-period>/ month</span>
+              </div>
+              <span class="pricing-daily" data-price-note>Billed monthly</span>
+            </div>
+            <ul class="pricing-features">
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Mobile ordering, delivery management, and up to 10 riders</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Advanced reports and analytics with CSV, Excel, and PDF exports</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Promotions, expense tracking, and accounts receivable</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Up to 3 stations, 500 products, 10,000 orders, 2,000 customers, 10 riders, and 10 staff</span>
+              </li>
+            </ul>
+            <a class="pricing-btn" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Business%20plan%20access" data-email-link data-email-subject="AquaHub Business plan access">Ask about Business access</a>
+          </article>
+
+          <!-- Pro plan -->
+          <article class="pricing-card" data-pricing-card data-plan-key="pro">
+            <div class="pricing-header">
+              <h3>Pro</h3>
+              <p>Advanced tools for multi-station operations.</p>
+              <div class="pricing-figure">
+                <data class="pricing-amount" data-price-amount value="99900">₱999</data>
+                <span class="pricing-period" data-price-period>/ month</span>
+              </div>
+              <span class="pricing-daily" data-price-note>Billed monthly</span>
+            </div>
+            <ul class="pricing-features">
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Mobile ordering and delivery tools when enabled for each station</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Consolidated station reports, delivery analytics, and customer insights</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Up to 10 stations, 10,000 products, 100,000 orders, and 50,000 customers</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+                </svg>
+                <span>Up to 100 riders and 100 staff</span>
+              </li>
+            </ul>
+            <a class="pricing-btn" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Pro%20plan%20access" data-email-link data-email-subject="AquaHub Pro plan access">Ask about Pro access</a>
+          </article>
+        </div>
+
+        <p class="pricing-note">
+          These are intended AquaHub plan catalogue prices, not a live checkout quote. Annual totals show the planned 20% discount.
+          Plan availability, actual price, payment, renewal, and cancellation terms are confirmed in Google Play where offered.
+          This page does not start a purchase.
+        </p>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section section-subtle home-faq" id="faq">
+      <div class="container faq-grid">
+        <div class="faq-head">
+          <span class="kicker">MGA MADALAS NA TANONG</span>
+          <h2>Clear answers before you get started.</h2>
+          <p>
+            Learn how AquaHub Owner and station-linked mobile ordering fit together.
+          </p>
+        </div>
+
+        <div class="faq-list">
+          <details class="faq-item" open>
+            <summary class="faq-question">
+              <span>Who is AquaHub for?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              <p><strong>AquaHub Owner</strong> is the Android business app for water-refilling station teams. Participating stations can offer customers a browser-based mobile-ordering link.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Does AquaHub work without an internet connection?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              <p>Many Owner workflows are local-first and synchronize when connectivity returns. Mobile ordering requires an active station link and its online ordering service.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Which plans include container tracking?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              <p>Basic container movement tracking is included in eligible paid plans. Station teams manually record acquisitions, loans, returns, damage, or loss; product setup does not infer bottle deposits or exchanges.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Gumagawa o nagbebenta ba ng drinking water ang AquaHub?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              <p>Hindi. Software platform lang ang AquaHub. Ang bawat water-refilling station ang responsable sa water treatment, permits, pricing, at fulfillment.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>How do I confirm plan price and billing?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              <p>The plan amounts on this page are the current intended catalogue prices. Where a paid plan is offered, check Google Play for the available plan, exact checkout price, billing period, renewal, and cancellation terms. This website does not process subscriptions.</p>
+            </div>
+          </details>
+
+          <details class="faq-item">
+            <summary class="faq-question">
+              <span>Puwede bang mag-request ng account at data deletion?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </summary>
+            <div class="faq-answer">
+              <p>Oo. Available ang account deletion sa loob ng apps o sa aming <a href="account-deletion.html" style="color:var(--brand); text-decoration:underline;">Account Deletion page</a>.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <span class="anchor-alias" id="owner-access" aria-hidden="true"></span>
+    <section class="home-final section" id="get-owner" aria-labelledby="final-title">
+      <div class="container home-final-grid">
+        <div class="home-final-copy">
+          <p class="home-kicker">BRING THE FLOW TO YOUR STATION</p>
+          <h2 id="final-title">A clearer day starts with the Owner app.</h2>
+          <p>Bring your counter, orders, inventory, customers, and reporting into a station-focused workflow. Compare the plan catalogue, then join the Owner app when access is available to you.</p>
+          <div class="home-final-actions"><button class="home-action home-action-primary is-unavailable" type="button" data-owner-play-cta disabled><span>Get Owner App on Google Play</span></button><a class="home-action home-action-secondary" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Owner%20closed%20testing%20access%20request" data-email-link data-email-subject="AquaHub Owner closed testing access request">Ask for tester access <span aria-hidden="true">↗</span></a></div>
+          <p class="owner-availability"><span class="availability-dot" aria-hidden="true"></span><strong>Closed testing.</strong> Owner access is currently limited to approved testers.</p>
+        </div>
+        <div class="home-final-art" aria-hidden="true"><span class="final-art-ring"></span><img src="assets/landing/water-sculpture.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="" /><span class="final-art-word">AquaHub</span></div>
+      </div>
+    </section>
+    <section class="newsletter-section" id="newsletter" aria-labelledby="newsletter-title">
+      <div class="container">
+        <div class="newsletter-card">
+          <div class="newsletter-copy">
+            <span class="kicker">AQUAHUB UPDATES</span>
+            <h2 id="newsletter-title">Stay Updated with AquaHub</h2>
+            <p>Get the latest AquaHub updates, new features, exclusive offers, and helpful tips for managing your water refilling station.</p>
+          </div>
+          <form class="newsletter-form" data-newsletter-form novalidate>
+            <div class="newsletter-fields">
+              <div class="newsletter-field">
+                <label for="newsletter-email">Email address <span aria-hidden="true">*</span></label>
+                <input id="newsletter-email" name="email" type="email" autocomplete="email" inputmode="email"
+                  placeholder="you@example.com" required aria-describedby="newsletter-email-error" />
+                <span class="newsletter-field-error" id="newsletter-email-error" data-newsletter-email-error></span>
+              </div>
+              <div class="newsletter-field">
+                <label for="newsletter-first-name">First name <span class="newsletter-optional">(optional)</span></label>
+                <input id="newsletter-first-name" name="firstName" type="text" autocomplete="given-name"
+                  maxlength="80" placeholder="Your first name" />
+              </div>
+            </div>
+            <div class="newsletter-consent">
+              <input id="newsletter-consent" name="consent" type="checkbox" required
+                aria-describedby="newsletter-consent-copy newsletter-consent-error" />
+              <div>
+                <label for="newsletter-consent" id="newsletter-consent-copy">
+                  I agree to receive AquaHub product updates, helpful tips, and promotional emails. I can unsubscribe at any time.
+                </label>
+                <a href="privacy.html">Read our Privacy Policy</a>
+                <span class="newsletter-field-error" id="newsletter-consent-error" data-newsletter-consent-error></span>
+              </div>
+            </div>
+            <input class="newsletter-honeypot" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+            <button class="newsletter-submit" type="submit" data-newsletter-submit disabled>
+              <span class="newsletter-spinner" aria-hidden="true"></span>
+              <span data-newsletter-label>Subscribe to Updates</span>
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M3.5 10a.75.75 0 0 1 .75-.75h9.69L10.22 5.53a.75.75 0 1 1 1.06-1.06l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06l3.72-3.72H4.25A.75.75 0 0 1 3.5 10Z"/></svg>
+            </button>
+            <p class="newsletter-status" data-newsletter-status role="status" aria-live="polite" aria-atomic="true"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Clean Professional Footer -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <img src="assets/aquahub-logo.png" alt="AquaHub Logo" width="28" height="28" />
+          <span>AquaHub</span>
+        </a>
+        <p>
+          Technology para sa modern Philippine water-refilling station operations at station-linked ordering.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul class="footer-links">
+          <li><a href="#mobile-ordering">Mobile Ordering</a></li>
+          <li><a href="#solutions">Why AquaHub</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Owner plans</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul class="footer-links">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="subscription-policy.html">Subscription Policy</a></li>
+          <li><a href="account-deletion.html">Account Deletion</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul class="footer-links">
+          <li><a href="support.html">Help & Support</a></li>
+          <li><a data-email-link href="mailto:adriel.dev.123@gmail.com">Email Support</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="container footer-bottom">
+      <span>© <span data-year></span> AquaHub. All rights reserved.</span>
+          <span>Para sa Philippine water-refilling stations.</span>
+    </div>
+  </footer>
+
+  <script src="pricing-utils.js?v=20261010-website-update" defer></script>
+  <script src="newsletter-config.js?v=20261010-reach" defer></script>
+  <script src="newsletter-utils.js?v=20261010-reach" defer></script>
+  <script src="newsletter.js?v=20261010-reach" defer></script>
+  <script src="main.js?v=20261010-redesign" defer></script>
+  <script src="motion.js?v=20261010-redesign" defer></script>
+</body>
+
+</html>
