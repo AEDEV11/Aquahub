@@ -52,3 +52,11 @@ supabase/.temp/
 # Operating system files
 .DS_Store
 Thumbs.db
+**/production/release/mapping.txt
+
+# Android generated files
+**/build/
+**/.gradle/
+*.apk
+*.aab
+**/outputs/mapping/
