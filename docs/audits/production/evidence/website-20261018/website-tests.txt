@@ -1,0 +1,29 @@
+✔ newsletter validation normalizes intent and requires explicit marketing consent (41.801714ms)
+✔ newsletter component is placed before the homepage footer and links the Privacy Policy (17.314217ms)
+✔ newsletter request sends consent only to the server endpoint and never includes provider credentials (11.23128ms)
+✔ Owner download links work without JavaScript and target the exact Play package (54.636544ms)
+✔ Owner CTA initialization updates real links without rebuilding their content (60.09886ms)
+✔ Owner Play URL validation accepts only the AquaHub Owner package (28.715658ms)
+✔ homepage shows owner-confirmed monthly prices and leaves annual offers to Play (129.251091ms)
+✔ annual calculator uses a 20 percent discount in integer centavos for sample inputs (10.493485ms)
+✔ Philippine peso formatting keeps annual centavos visible (555.715337ms)
+✔ monthly and annual calculator reject invalid price input (39.681036ms)
+✔ marketing page no longer promotes a downloadable Customer app (74.273553ms)
+✔ support and plan inquiry email links have actionable destinations (44.648605ms)
+✔ canonical, public page links, and station ordering routes remain available (45.644879ms)
+✔ subscription policy matches owner-confirmed monthly references and authoritative Play checkout (20.508225ms)
+✔ email links remain actionable without JavaScript on every public HTML page (50.446595ms)
+✔ every public page has working local links, fragment targets, and assets (367.300644ms)
+✔ public pages use SVG icons instead of emoji and Unicode arrow controls (12.773404ms)
+✔ public copy matches online-only checkout and real open-test billing (27.471357ms)
+✔ privacy covers guest orders, proof uploads, browser storage, hosting and SMS (7.480941ms)
+✔ legal pages link all policies and have canonical metadata (6.57569ms)
+✔ hosting preserves ordering routes and excludes development files (10.715585ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 21
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6025.211765

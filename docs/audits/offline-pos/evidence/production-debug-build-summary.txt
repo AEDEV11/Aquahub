@@ -1,0 +1,29 @@
+AquaHub Owner production-flavor debug validation
+Date: 2026-10-17
+
+Variant: productionDebug (production flavor, debug build type)
+Gradle command:
+./gradlew :app:testProductionDebugUnitTest :app:lintProductionDebug :app:assembleProductionDebug :app:assembleProductionDebugAndroidTest --no-daemon --max-workers=2 --console=plain
+Result: BUILD SUCCESSFUL; 8m 34s; 91 actionable tasks (36 executed, 12 from cache, 43 up-to-date).
+
+Unit tests: 190 passed, 0 failed, 0 errors, 0 skipped.
+Lint: task passed; 87 warnings, 0 errors. No warning suppression was added for this build.
+Android instrumentation package: assembled, not executed on a device.
+
+App package: com.aesprt.aquahub
+Version: code 12, aq-1.0.7
+APK: AquaHub/app/build/outputs/apk/production/debug/app-production-debug.apk
+APK size: 41,921,971 bytes
+APK SHA-256: ff6a4baba35c4f98882c5281308ebde43c96ab8035c628ba8f2d0257b4dc4e79
+Instrumentation APK: AquaHub/app/build/outputs/apk/androidTest/production/debug/app-production-debug-androidTest.apk
+APK signer: Android Debug certificate (not the Play upload certificate).
+
+Sanitized configuration checks:
+- BuildConfig flavor=production and buildType=debug.
+- BuildConfig application ID/version match the metadata above.
+- BuildConfig Supabase host is pfkxrggexueltytxtqil.supabase.co.
+- Production verifier public key is configured, matches the local production property, and is present in the APK DEX; key bytes are intentionally omitted.
+- APK DEX contains the production Supabase host and does not contain the QA emulator-loopback URL 10.0.2.2:24554.
+- No authentication, account registration, business data creation, offline authorization, order, payment, inventory mutation, or production function request was performed with this build.
+
+The complete sanitized Gradle output is in production-debug-build.log. Build success does not establish runtime, backend, device, Offline POS, release-signing, or Play readiness.

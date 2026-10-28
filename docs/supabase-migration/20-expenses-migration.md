@@ -6,6 +6,8 @@ Expenses are owner/station-scoped records with integer-centavo amount, category,
 
 The hosted expense foundation migration adds `organization_id`, `created_by`, `receipt_path`, and idempotent `operation_id`, preserves `incurred_at` as the existing expense-date field, protects tenant/creator fields with a trigger, and replaces the broad policy with owner/manager station-scoped RLS. `expense_summary` keeps aggregation in PostgreSQL. Amounts remain `bigint` centavos end to end.
 
+The `operation_id` unique index must be non-partial: Android replays writes with `ON CONFLICT (operation_id)`, which cannot infer a partial unique index without its predicate. A full unique index preserves multiple legacy `NULL` IDs while enabling idempotent retries.
+
 `SupabaseExpenseDataSource` is now wired into the Room-backed `ExpenseRepository`: authenticated, provisioned new writes/update/archive through Supabase and cache the returned UUID; offline/unprovisioned writes retain the legacy outbox fallback until offline reconciliation is validated. This avoids two online writable authorities. Firebase expense data source/mapper/queue remains historical compatibility only for that fallback and import.
 
 `tools/supabase-migration/migrate-expenses.mjs` is dry-run by default, requires explicit hosted-production confirmation for writes, validates station mapping, centavos, dates, legacy IDs, operation IDs, timestamps, receipt paths, and reports creator mappings/conflicts. It never deletes Firebase data or sends notifications.

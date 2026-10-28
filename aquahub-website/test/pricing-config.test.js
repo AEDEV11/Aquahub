@@ -11,27 +11,17 @@ function pagePlanPrices() {
   return Object.fromEntries(cards.map(([, plan, cents]) => [plan, Number(cents)]));
 }
 
-test('homepage has one monthly price source for each advertised plan', () => {
-  assert.deepEqual(pagePlanPrices(), {
-    free: 0,
-    starter: 19900,
-    business: 49900,
-    pro: 99900
-  });
+test('homepage shows owner-confirmed monthly prices and leaves annual offers to Play', () => {
+  assert.deepEqual(pagePlanPrices(), { free: 0, starter: 19900, business: 49900, pro: 99900 });
+  assert.doesNotMatch(homepage, /data-billing-selector|Save 20%|₱299|₱699|₱1,299/);
+  assert.match(homepage, /Annual prices are shown in the app/);
 });
 
-test('annual prices and savings use a 20 percent discount in integer centavos', () => {
+test('annual calculator uses a 20 percent discount in integer centavos for sample inputs', () => {
   assert.equal(pricing.annualDiscountPercent, 20);
-  const expected = {
-    starter: [191040, 47760],
-    business: [479040, 119760],
-    pro: [959040, 239760]
-  };
-
-  for (const [plan, monthly] of Object.entries(pagePlanPrices())) {
-    if (plan === 'free') continue;
-    const annual = pricing.annualPriceCentavos(monthly);
-    assert.deepEqual([annual, monthly * 12 - annual], expected[plan]);
+  for (const [monthly, annual, savings] of [[19900, 191040, 47760], [49900, 479040, 119760], [99900, 959040, 239760]]) {
+    assert.equal(pricing.annualPriceCentavos(monthly), annual);
+    assert.equal(monthly * 12 - annual, savings);
   }
 });
 
@@ -80,13 +70,13 @@ test('canonical, public page links, and station ordering routes remain available
   }
 });
 
-test('subscription policy matches the intended catalogue and does not publish retired monthly prices', () => {
+test('subscription policy matches owner-confirmed monthly references and authoritative Play checkout', () => {
   const policy = fs.readFileSync(path.join(__dirname, '..', 'subscription-policy.html'), 'utf8');
-  assert.match(policy, /Starter:<\/strong> ₱199\/month/);
-  assert.match(policy, /Business:<\/strong> ₱499\/month/);
-  assert.match(policy, /Pro:<\/strong> ₱999\/month/);
-  assert.doesNotMatch(policy, /₱299\/month|₱699\/month|₱1,499\/month/);
+  for (const price of ['₱199/month', '₱499/month', '₱999/month']) assert.ok(policy.includes(price));
+  assert.doesNotMatch(policy, /₱299\/month|₱699\/month|₱1,299\/month/);
   assert.match(policy, /not a live checkout quote/);
+  assert.match(policy, /Google Play checkout price is authoritative/);
+  for (const plan of ['Free', 'Starter', 'Business', 'Pro']) assert.ok(policy.includes(plan));
 });
 
 test('email links remain actionable without JavaScript on every public HTML page', () => {

@@ -2,9 +2,10 @@
 
 ## Status
 
-**IMPLEMENTED LOCALLY; HOSTED MIGRATIONS AND EDGE FUNCTION NOT DEPLOYED.** The
-browser app is the fallback for the existing `/s/{publicStationCode}` QR route.
-It is a separate browser client and does not create a Supabase Auth account.
+**DEPLOYED TO PRODUCTION (2026-10-18); FULL STAGING ACCEPTANCE REMAINS INCOMPLETE.**
+Firebase Hosting serves the browser fallback for the existing
+`/s/{publicStationCode}` QR route. It is a separate browser client and does not
+create a Supabase Auth account.
 
 ## Hosting architecture
 
@@ -20,19 +21,18 @@ It is a separate browser client and does not create a Supabase Auth account.
   preserving the built `order/` output and `/.well-known/assetlinks.json`.
 - Supabase remains the database, Storage and guest order API. Firebase Hosting
   is not a backend and the static site never writes privileged database rows.
-- A read-only Supabase inventory found project `AquahubDB`
-  (`pfkxrggexueltytxtqil`) as the only accessible project, no branches, and no
-  deployed `guest-order` function. The remote migration history is nine
-  versions behind the local migration directory; see
-  `docs/production-readiness/AQUAHUB_STAGING_RUNBOOK.md` for the exact pending
-  versions. No remote changes were made.
+- Production project `AquahubDB` (`pfkxrggexueltytxtqil`) has active
+  `guest-order` and `guest-payment-proof` Edge Functions. The additive
+  `web_payment_methods_and_proofs` migration updates the guest order RPC,
+  exposes a sanitized plan-eligibility result for pickup account billing, and
+  adds a service-role-only payment receipt RPC.
 
 ## Request path and Owner compatibility
 
 1. `aquahub-website/order-app/src/main.js` reads `public_stations` and
    `public_products` for the station QR code. Images resolve from the existing
    `station-assets` and `product-images` Storage buckets.
-   **IMPLEMENTED in local source; release pending:** It also checks the public
+   **IMPLEMENTED in production:** It also checks the public
    read-time ordering eligibility RPC before showing checkout and again before
    submission. Missing or failed eligibility closes checkout. The RPC applies
    effective `MOBILE_APP_ORDERING` and oldest-active `STATION_COUNT` slots;
@@ -49,7 +49,8 @@ It is a separate browser client and does not create a Supabase Auth account.
    promotions, stock locks/decrements, fee calculation, item snapshots, and
    order creation to the existing `create_order_internal` transaction.
 4. The stored order uses the existing `CUSTOMER_WEB` source, `PENDING` order
-   status, `PENDING` payment status, integer-centavo totals, `orders` columns,
+   status, `PENDING` payment status until an online proof receipt is recorded,
+   integer-centavo totals, `orders` columns,
    and `order_items` snapshots. `customer_uid` remains null for a guest. In the
    same transaction, the server matches an active customer at that station by
    normalized Philippine mobile number or creates one when the plan permits,
@@ -103,7 +104,15 @@ It is a separate browser client and does not create a Supabase Auth account.
   are not saved with the profile.
 - Philippine numbers are normalized to `+639XXXXXXXXX`. A station's enabled
   payment methods and applicable order rules are displayed and checked again
-  on the server. Cash is never invented when disabled.
+  on the server. Pickup supports enabled Cash, eligible existing-customer
+  account billing, and enabled GCash/Maya. Delivery supports enabled COD and
+  enabled GCash/Maya; Cash and account billing are rejected server-side.
+  GCash/Maya checkout requires a reference and a private image upload. The
+  guest proof endpoint writes a full `PAID` receipt and changes the order to
+  paid after receiving the submission. This records customer-submitted
+  evidence; it does not verify settlement with GCash or Maya. The Owner app
+  displays the reference and image, and its settlement prompt is suppressed
+  for paid orders.
 - Coordinates are hidden from the form. Customers can search a Philippine
   address, choose a map point, or use device location in the Google Maps picker.
   A selected address is read-only in checkout; house/unit and landmark details
@@ -121,6 +130,8 @@ It is a separate browser client and does not create a Supabase Auth account.
 The storefront follows the AquaHub Customer blue/cyan palette. It has a
 responsive product catalog, category filters and search, promotion-aware prices,
 desktop cart summary, mobile sticky cart bar, and cart/product bottom sheets.
+Checkout shows the regular subtotal, promotion savings, discounted subtotal,
+delivery fee, and final total. Online proof fields appear only for GCash/Maya.
 Supabase image references in `supabase://bucket/object` form resolve to public
 Storage URLs; direct URLs and raw object paths remain supported. Refill product
 details let the customer choose an exchange, their own container, or a borrowed
@@ -214,17 +225,61 @@ a hosted release.
 
 ## Release state
 
-The local guest-ordering path is not deployed: the latest read-only inventory
-did not find a hosted `guest-order` Edge Function. Hosted `CUSTOMER_WEB` rows
-were present, but their creating client/function was not confirmed. The new
-customer-link migration
-`supabase/migrations/20261010155326_link_guest_web_orders_to_station_customers.sql`
-and the Owner customer-history changes remain local source only. Deploy the
-database migration and publish the Owner app as separate release operations.
-Before enabling the local guest flow, reconcile the deployed web-order path
-because the function and browser client are also not deployed. See
-`docs/production-readiness/WEB_ORDERING_PREDEPLOYMENT.md` for separate frontend
-and backend checklists, preview-channel CORS setup, key restrictions, recovery,
-monitoring, and release criteria. Current recommendation: NO-GO until the
-location provider, trusted IP behavior, and actual Owner workflow pass against
-an approved isolated staging backend.
+On 2026-10-18, the Owner authorized a direct production release. Supabase
+migrations `20261017135904_owner_subscription_history_read_policy.sql` and
+`20261017150000_fix_quantity_break_percentage_promotions.sql` were applied to
+project `pfkxrggexueltytxtqil`; the active `guest-order` Edge Function was
+version 19. Firebase Hosting site `aquahub-506411` was published at
+`https://aquahub-506411.web.app`.
+
+The web checkout payment update was subsequently applied to production as
+`web_payment_methods_and_proofs`. It enforces account-billing plan access in
+the order RPC and records customer-submitted GCash/Maya proof as a paid receipt.
+The `guest-payment-proof` Edge Function is active with JWT verification
+disabled because it validates the guest capability token itself. The updated
+web bundle is deployed to Firebase Hosting.
+The submission is not a bank/provider settlement verification. Owner payment
+proof display changes are in source and require an Owner app update to reach
+devices.
+
+For this payment update, `npm test` passed all 19 web tests and the Vite
+production build completed. `./gradlew testProductionDebugUnitTest
+assembleProductionDebug` passed for the Owner production variant. Production
+smoke checks returned HTTP 200 for `/order/`, `/s/{code}`, and
+`/order/s/{code}`, and confirmed the published bundle contains the promotion,
+account-balance, and proof-submission paths. The account-eligibility RPC
+returned HTTP 200; the proof endpoint returned HTTP 204 to allowed web origins.
+The migration is applied and the two new RPC grants were checked. The local
+Supabase pgTAP suite was not run because Docker is unavailable in this
+environment; no live test order or payment was created.
+
+The deployed `create_order_internal` applies percentage-based
+`QUANTITY_BREAK` discounts after the configured minimum quantity is met, while
+retaining fixed-price quantity-break behavior. Production verification found
+the subscription-history member policy enabled, all 16 web unit tests passing,
+and successful HTTP responses for `/`, `/order/`, `/s/{stationCode}`,
+`/order/s/{stationCode}`, the App Links file, the built bundle, and a local font.
+
+This direct release did not go through an isolated staging environment. Real
+Places/map behavior, Maps key restrictions, gateway IP provenance, and the
+Owner-device end-to-end order workflow remain unverified. See
+`docs/production-readiness/WEB_ORDERING_PREDEPLOYMENT.md` for those remaining
+checks, rollback steps, and monitoring guidance.
+
+
+### Public marketing/legal site update — 2026-10-18
+
+IMPLEMENTED: Hosting-only update adds real Owner Google Play listing links and
+open-test enrollment links, online-only public copy, SVG icons, locally served
+fonts, corrected policy contents navigation, updated legal/support disclosures
+and a custom 404. All existing `/order` build artifacts were preserved; nine
+published files matched the Firebase origin. No backend configuration or data
+was changed in this website task. The final website cache revision is r3.
+
+Owner confirmed monthly Play prices ₱199 / ₱499 / ₱999. Website uses these
+references and defers annual quotes to Play. Read-only production catalog
+metadata still shows ₱299 / ₱699 / ₱1,299; backend reconciliation remains a
+separate task. Public listing returned Not Found in the observed browser, so
+public download availability remains BLOCKED pending Play Console verification.
+See `docs/audits/production/WEBSITE_PUBLIC_RELEASE_20261018.md` for evidence and
+verification limits.

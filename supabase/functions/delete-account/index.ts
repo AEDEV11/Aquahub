@@ -24,6 +24,34 @@ Deno.serve(async (request) => {
   const user = authData.user;
   if (authError || !user) return json(401, { error: "UNAUTHORIZED" });
 
+  // Keep marketing consent aligned with account deletion. Only withdraw an
+  // existing active Owner subscription; set_my_marketing_preference(false)
+  // queues provider removal without creating a new suppression row for users
+  // who never subscribed.
+  const { data: profile, error: profileError } = await admin.from("profiles")
+    .select("role").eq("id", user.id).maybeSingle();
+  if (profileError) return json(503, { error: "ACCOUNT_PROFILE_LOOKUP_FAILED" });
+  if (profile?.role === "OWNER") {
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")?.trim();
+    if (!anonKey) return json(503, { error: "ACCOUNT_SERVICE_UNAVAILABLE" });
+    const userClient = createClient(supabaseUrl, anonKey, {
+      global: { headers: { Authorization: `Bearer ${accessToken}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data: preferences, error: preferenceError } = await userClient.rpc(
+      "get_my_marketing_preference",
+    );
+    if (preferenceError) return json(503, { error: "ACCOUNT_MARKETING_LOOKUP_FAILED" });
+    const preference = Array.isArray(preferences) ? preferences[0] : preferences;
+    if (preference?.subscribed === true) {
+      const { error: withdrawalError } = await userClient.rpc(
+        "set_my_marketing_preference",
+        { p_subscribed: false },
+      );
+      if (withdrawalError) return json(503, { error: "ACCOUNT_MARKETING_CLEANUP_FAILED" });
+    }
+  }
+
   let operation = "delete";
   try {
     const body = await request.json() as { operation?: unknown };

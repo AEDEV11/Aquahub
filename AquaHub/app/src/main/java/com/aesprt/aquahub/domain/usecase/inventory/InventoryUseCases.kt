@@ -110,7 +110,7 @@ class RecordContainerDeliveryUseCase(
         inventoryRepository.insertTransaction(
             ContainerTransaction(
                 stationId = stationId,
-                customerId = customerId?.takeIf { it > 0 },
+                customerId = customerId,
                 customerName = customerName,
                 orderId = orderId,
                 type = ContainerTransactionType.DELIVERED,
@@ -120,9 +120,7 @@ class RecordContainerDeliveryUseCase(
             )
         )
         inventoryRepository.adjustContainer(stationId, sizeLabel, -quantity, InventoryRepository.ContainerField.AVAILABLE)
-        if (customerId != null && customerId > 0) {
-            inventoryRepository.adjustContainer(stationId, sizeLabel, quantity, InventoryRepository.ContainerField.WITH_CUSTOMERS)
-        }
+        inventoryRepository.adjustContainer(stationId, sizeLabel, quantity, InventoryRepository.ContainerField.WITH_CUSTOMERS)
     }
 }
 

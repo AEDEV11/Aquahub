@@ -30,6 +30,7 @@ private const val DENIAL_CONFIRMATION_CHECKS = 2
 fun SubscriptionGate(
     feature: SubscriptionFeature,
     onSubscription: () -> Unit,
+    onLoadingChanged: (Boolean) -> Unit = {},
     content: @Composable () -> Unit
 ) {
     if (LocalInspectionMode.current) {
@@ -41,6 +42,7 @@ fun SubscriptionGate(
     val auth: AuthRepository = koinInject()
     val checkAccess: CheckSubscriptionAccessUseCase = koinInject()
     val refreshSubscription: RefreshSubscriptionStateUseCase = koinInject()
+    val loadingChanged by rememberUpdatedState(onLoadingChanged)
     val access by produceState<SubscriptionAccessResult?>(null, feature) {
         combine(stationContext.observeActiveStationId(), auth.observeCurrentOwner()) { active, owner ->
             if (owner == null) null else active ?: owner.stationId
@@ -88,6 +90,13 @@ fun SubscriptionGate(
                 }
             }
         }
+    }
+    val isLoading = access == null
+    LaunchedEffect(isLoading) {
+        loadingChanged(isLoading)
+    }
+    DisposableEffect(Unit) {
+        onDispose { loadingChanged(false) }
     }
     when (access) {
         SubscriptionAccessResult.Allowed -> content()

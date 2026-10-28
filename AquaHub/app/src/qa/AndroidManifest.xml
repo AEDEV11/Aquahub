@@ -8,9 +8,6 @@
         <provider
             android:name="com.google.firebase.provider.FirebaseInitProvider"
             tools:node="remove" />
-        <provider
-            android:name="com.google.firebase.crashlytics.CrashlyticsInitProvider"
-            tools:node="remove" />
         <receiver
             android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
             tools:node="remove" />

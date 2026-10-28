@@ -6,8 +6,8 @@
 const AQUAHUB_CONFIG = {
   supportEmail: "adriel.dev.123@gmail.com",
   privacyEmail: "adriel.dev.123@gmail.com",
-  // Set only after confirming the Owner package and the intended Play audience.
-  ownerPlayUrl: ""
+  // Owner package only; Google Play controls public release availability.
+  ownerPlayUrl: "https://play.google.com/store/apps/details?id=com.aesprt.aquahub"
 };
 
 const qs = (selector, root = document) => root.querySelector(selector);
@@ -31,15 +31,11 @@ function initOwnerPlayCtas() {
   const url = AQUAHUB_CONFIG.ownerPlayUrl;
   if (!isOwnerPlayUrl(url)) return;
 
-  qsa('[data-owner-play-cta]').forEach(button => {
-    const link = document.createElement('a');
-    link.className = button.className.replace(/\bis-unavailable\b/g, '').trim();
+  // Real anchors in HTML also work when JavaScript is unavailable.
+  qsa('a[data-owner-play-cta]').forEach(link => {
     link.href = url;
     link.rel = 'noopener noreferrer';
     link.target = '_blank';
-    link.dataset.ownerPlayCta = '';
-    link.innerHTML = button.innerHTML;
-    button.replaceWith(link);
   });
 }
 
@@ -323,6 +319,17 @@ let initialized = false;
 function init() {
   if (initialized) return;
   initialized = true;
+
+  const visitCounter = document.createElement('script');
+  visitCounter.src = '/visit-counter.js';
+  visitCounter.async = true;
+  document.head.appendChild(visitCounter);
+
+  const websiteAnalytics = document.createElement('script');
+  websiteAnalytics.src = '/firebase-analytics.js';
+  websiteAnalytics.defer = true;
+  websiteAnalytics.setAttribute('data-cfasync', 'false');
+  document.head.appendChild(websiteAnalytics);
 
   initEmailLinks();
   initOwnerPlayCtas();

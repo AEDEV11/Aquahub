@@ -9,6 +9,7 @@ import com.aesprt.aquahub.domain.repository.GoogleAccountNeedsSetupException
 import com.aesprt.aquahub.domain.repository.AuthRepository
 import com.aesprt.aquahub.domain.repository.LocalAccountSwitchConfirmationRequiredException
 import com.aesprt.aquahub.data.supabase.auth.SupabaseAuthDataSource
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -86,9 +87,12 @@ class LoginViewModel(
     fun requestOtp() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null, canClearPreviousAccountData = false, showLocalDataClearDialog = false, infoMessage = null) }
-            runCatching { authDataSource.requestPhoneOtp(_uiState.value.phone) }
+            runCatching { authDataSource.requestPhoneOtp(_uiState.value.phone, createUser = false) }
                 .onSuccess { _uiState.update { it.copy(isLoading = false, otpRequested = true) } }
-                .onFailure { error -> _uiState.update { it.copy(isLoading = false, errorMessage = error.message ?: "Unable to send verification code") } }
+                .onFailure { error ->
+                    if (error is CancellationException) throw error
+                    _uiState.update { it.copy(isLoading = false, errorMessage = error.message ?: "Unable to send verification code") }
+                }
         }
     }
 
@@ -103,7 +107,10 @@ class LoginViewModel(
                     _uiState.update { it.copy(isLoading = false) }
                     _events.emit(LoginEvent.LoginSuccess)
                 }
-                .onFailure { error -> onSignInFailure(error, "Verification failed") }
+                .onFailure { error ->
+                    if (error is CancellationException) throw error
+                    onSignInFailure(error, "Verification failed")
+                }
         }
     }
 
@@ -118,7 +125,10 @@ class LoginViewModel(
                     _uiState.update { it.copy(isLoading = false) }
                     _events.emit(LoginEvent.LoginSuccess)
                 }
-                .onFailure { error -> onSignInFailure(error, "Email authentication failed") }
+                .onFailure { error ->
+                    if (error is CancellationException) throw error
+                    onSignInFailure(error, "Email authentication failed")
+                }
         }
     }
 

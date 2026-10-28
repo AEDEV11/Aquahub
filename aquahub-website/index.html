@@ -31,13 +31,9 @@
       "url": "https://aquahub.aesprt.com/"
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet" />
   <link rel="preload" as="image" href="assets/landing/station-hero.webp" />
-  <link rel="stylesheet" href="styles.css?v=20261010-website-update" />
-  <link rel="stylesheet" href="landing.css?v=20261010-redesign" />
+  <link rel="stylesheet" href="styles.css?v=20261025-analytics" />
+  <link rel="stylesheet" href="landing.css?v=20261018-public" />
 </head>
 
 <body class="home-page">
@@ -64,7 +60,7 @@
         <a href="#features">Features</a>
         <a href="#pricing">Plans</a>
         <a href="#faq">FAQ</a>
-        <a class="nav-cta" href="#get-owner">Get Owner App</a>
+        <a class="nav-cta" href="https://play.google.com/store/apps/details?id=com.aesprt.aquahub" data-owner-play-cta target="_blank" rel="noopener noreferrer" aria-label="Get AquaHub Owner on Google Play (opens in a new tab)"><img class="play-icon" src="assets/google-play-prism.svg" width="20" height="22" alt="" aria-hidden="true" /><span>Get AquaHub Owner</span></a>
       </nav>
     </div>
   </header>
@@ -79,12 +75,12 @@
           <h1 id="hero-title">Every refill runs better when <em>everything flows.</em></h1>
           <p class="home-hero-lead">AquaHub Owner brings walk-in sales, orders, stock, customers, and daily station work into one clear view. Give your team room to focus on the service behind every gallon.</p>
           <div class="home-hero-actions">
-            <button class="home-action home-action-primary is-unavailable" type="button" data-owner-play-cta disabled><span>Get Owner App on Google Play</span></button>
-            <a class="home-action home-action-secondary" href="#story">See how it works <span aria-hidden="true">↓</span></a>
+            <a class="home-action home-action-primary" href="https://play.google.com/store/apps/details?id=com.aesprt.aquahub" data-owner-play-cta target="_blank" rel="noopener noreferrer" aria-label="Get AquaHub Owner on Google Play (opens in a new tab)"><img class="play-icon" src="assets/google-play-prism.svg" width="20" height="22" alt="" aria-hidden="true" /><span>Get AquaHub Owner</span></a>
+            <a class="home-action home-action-secondary" href="#story">See how it works <span aria-hidden="true"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 5v14m-7-7 7 7 7-7" /></svg></span></a>
           </div>
-          <p class="owner-availability" id="hero-owner-availability"><span class="availability-dot" aria-hidden="true"></span><strong>Closed testing.</strong> Owner access is currently limited to approved testers. <a href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Owner%20closed%20testing%20access%20request" data-email-link data-email-subject="AquaHub Owner closed testing access request">Ask for tester access</a>.</p>
+          <p class="owner-availability" id="hero-owner-availability"><span class="availability-dot" aria-hidden="true"></span><strong>Online-only open testing.</strong> Internet is required for checkout. <a href="https://play.google.com/apps/testing/com.aesprt.aquahub" target="_blank" rel="noopener noreferrer">Join the test on Google Play</a>. Access depends on Google Play release availability and your region.</p>
           <ul class="home-hero-facts" aria-label="AquaHub highlights">
-            <li>Local-first Owner workflows</li>
+            <li>Online-only checkout</li>
             <li>Plan-based station tools</li>
             <li>Browser ordering when enabled</li>
           </ul>
@@ -100,7 +96,7 @@
             <strong>Station at a glance</strong>
             <div class="hero-dashboard-grid"><span>Orders <b>18</b></span><span>Stock alerts <b>03</b></span></div>
             <span class="hero-dashboard-rule"></span>
-            <span class="hero-dashboard-foot"><i></i> Local work ready</span>
+            <span class="hero-dashboard-foot"><i></i> Station work in view</span>
           </div>
           <div class="hero-bubble hero-bubble-one"></div>
           <div class="hero-bubble hero-bubble-two"></div>
@@ -108,7 +104,7 @@
         </div>
       </div>
       <div class="home-hero-bottom" aria-hidden="true"><span>SCROLL TO FOLLOW THE FLOW</span><span class="scroll-line"></span><span>01 / 05</span></div>
-      <svg class="hero-waterline" viewBox="0 0 1440 180" preserveAspectRatio="none" aria-hidden="true"><path class="hero-waterline-back" d="M0 95C190 36 328 148 555 96S889 27 1092 80s256 60 348 17v83H0Z"/><path class="hero-waterline-front" d="M0 111c170 55 325-54 520-20s308 88 518 24 305-36 402-2v67H0Z"/></svg>
+      <svg class="hero-waterline" viewBox="0 0 1440 180" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="hero-waterline-back" d="M0 95C190 36 328 148 555 96S889 27 1092 80s256 60 348 17v83H0Z"/><path class="hero-waterline-front" d="M0 111c170 55 325-54 520-20s308 88 518 24 305-36 402-2v67H0Z"/></svg>
     </section>
 
     <section class="home-why section" id="solutions" aria-labelledby="why-title">
@@ -126,7 +122,7 @@
             <div><span>02</span><div><h3>Know what is ready</h3><p>Keep product and stock information close to daily decisions.</p></div></div>
             <div><span>03</span><div><h3>See the whole day</h3><p>Review station activity and reports with tools available to your plan.</p></div></div>
           </div>
-          <a class="home-text-link" href="#owner-app">Explore the Owner app <span aria-hidden="true">↗</span></a>
+          <a class="home-text-link" href="#owner-app">Explore the Owner app <span aria-hidden="true"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10" /></svg></span></a>
         </div>
       </div>
     </section>
@@ -177,7 +173,7 @@
         </div>
         <div class="screenshot-carousel" data-screenshot-carousel aria-roledescription="carousel" aria-label="AquaHub Owner app screenshots">
           <div class="carousel-stage">
-            <button class="carousel-arrow carousel-arrow-prev" type="button" data-carousel-prev aria-label="Previous Owner app screenshot">←</button>
+            <button class="carousel-arrow carousel-arrow-prev" type="button" data-carousel-prev aria-label="Previous Owner app screenshot"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 12H5m7-7-7 7 7 7" /></svg></button>
             <div class="carousel-viewport">
               <div class="carousel-track" data-carousel-track>
                 <figure class="screenshot-slide is-active" data-slide="0" aria-hidden="false">
@@ -206,7 +202,7 @@
                 </figure>
               </div>
             </div>
-            <button class="carousel-arrow carousel-arrow-next" type="button" data-carousel-next aria-label="Next Owner app screenshot">→</button>
+            <button class="carousel-arrow carousel-arrow-next" type="button" data-carousel-next aria-label="Next Owner app screenshot"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14m-7-7 7 7-7 7" /></svg></button>
           </div>
           <div class="carousel-controls">
             <div class="carousel-dots" role="group" aria-label="Choose an Owner app screenshot">
@@ -240,7 +236,7 @@
         <div class="home-ordering-visual" aria-hidden="true">
           <div class="ordering-halo"></div>
           <div class="ordering-wave"></div>
-          <div class="ordering-phone"><div class="ordering-phone-camera"></div><div class="ordering-phone-screen"><span class="ordering-phone-overline">STATION LINK · IN YOUR BROWSER</span><strong>Order from your station</strong><p>Browse the catalog published for this station.</p><div class="ordering-product"><span class="ordering-product-icon">◉</span><span>Water refill<small>Published by the station</small></span><span aria-hidden="true">↗</span></div><div class="ordering-product"><span class="ordering-product-icon">◉</span><span>Containers<small>When available</small></span><span aria-hidden="true">↗</span></div><span class="ordering-phone-cta">Choose available options</span></div></div>
+          <div class="ordering-phone"><div class="ordering-phone-camera"></div><div class="ordering-phone-screen"><span class="ordering-phone-overline">STATION LINK · IN YOUR BROWSER</span><strong>Order from your station</strong><p>Browse the catalog published for this station.</p><div class="ordering-product"><span class="ordering-product-icon">◉</span><span>Water refill<small>Published by the station</small></span><span aria-hidden="true"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10" /></svg></span></div><div class="ordering-product"><span class="ordering-product-icon">◉</span><span>Containers<small>When available</small></span><span aria-hidden="true"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10" /></svg></span></div><span class="ordering-phone-cta">Choose available options</span></div></div>
           <div class="ordering-floating-note"><span>NO EXTRA APP</span><strong>A simple mobile link.</strong></div>
         </div>
       </div>
@@ -258,7 +254,7 @@
           <!-- Feature 1: POS & Orders -->
           <div class="feature-box">
             <div class="feature-icon-wrapper">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <rect x="2" y="3" width="20" height="14" rx="2" />
                 <line x1="8" y1="21" x2="16" y2="21" />
                 <line x1="12" y1="17" x2="12" y2="21" />
@@ -271,7 +267,7 @@
           <!-- Feature 2: Container Tracking -->
           <div class="feature-box">
             <div class="feature-icon-wrapper">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <path d="M6 2h12v4H6zM4 6h16v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6z" />
                 <path d="M10 10v6M14 10v6" />
               </svg>
@@ -283,7 +279,7 @@
           <!-- Feature 3: Rider Logistics -->
           <div class="feature-box">
             <div class="feature-icon-wrapper">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <circle cx="12" cy="10" r="3" />
                 <path d="M12 2a8 8 0 00-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 00-8-8z" />
               </svg>
@@ -292,22 +288,22 @@
             <p>Eligible plans include delivery management and rider assignment. Teams can open a delivery pin in Maps; live rider tracking and route planning are not included.</p>
           </div>
 
-          <!-- Feature 4: Offline-First Engine -->
+          <!-- Feature 4: Online-only checkout -->
           <div class="feature-box">
             <div class="feature-icon-wrapper">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <path d="M18.36 6.64a9 9 0 11-12.73 0" />
                 <line x1="12" y1="2" x2="12" y2="12" />
               </svg>
             </div>
-            <h3>Local-first operations</h3>
-            <p>Many Owner workflows remain available offline, with pending changes queued for synchronization when connectivity returns.</p>
+            <h3>Online-only checkout</h3>
+            <p>An internet connection is required to complete sales and confirm orders, payments, and stock updates. Offline checkout is not available in this release.</p>
           </div>
 
           <!-- Feature 5: Station-linked browser ordering -->
           <div class="feature-box">
             <div class="feature-icon-wrapper">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <rect x="5" y="2" width="14" height="20" rx="2" />
                 <line x1="12" y1="18" x2="12.01" y2="18" />
               </svg>
@@ -319,7 +315,7 @@
           <!-- Feature 6: Reports & Exports -->
           <div class="feature-box">
             <div class="feature-icon-wrapper">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <line x1="18" y1="20" x2="18" y2="10" />
                 <line x1="12" y1="20" x2="12" y2="4" />
                 <line x1="6" y1="20" x2="6" y2="14" />
@@ -341,21 +337,7 @@
           <p>Compare the current AquaHub Owner plan catalogue. Features and limits are based on the selected plan.</p>
         </div>
 
-        <fieldset class="billing-selector" data-billing-selector>
-          <legend>Billing frequency</legend>
-          <label class="billing-option">
-            <input type="radio" name="billing-cycle" value="monthly" checked />
-            <span>Monthly</span>
-          </label>
-          <label class="billing-option">
-            <input type="radio" name="billing-cycle" value="annual" />
-            <span>Annual</span>
-          </label>
-          <span class="annual-savings-label">Save 20% vs 12 monthly payments</span>
-        </fieldset>
-        <p class="billing-summary" data-billing-summary aria-live="polite">
-          Monthly amounts are shown. Annual billing, where offered, saves 20% compared with 12 monthly payments.
-        </p>
+<p class="billing-summary">Monthly reference prices are shown below. Check annual prices, available offers, and final renewal terms in Google Play before purchasing.</p>
 
         <div class="pricing-grid">
           <!-- Free plan -->
@@ -371,7 +353,7 @@
             </div>
             <ul class="pricing-features">
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -379,7 +361,7 @@
                 <span>Hanggang 100 orders bawat buwan</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -387,7 +369,7 @@
                 <span>Walk-in POS and daily order records</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -395,7 +377,7 @@
                 <span>Customer directory and basic reports · up to 50 customers</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -404,7 +386,7 @@
               </li>
               <li class="feature-not-included"><span>Mobile ordering, rider management, and delivery dispatch are not included</span></li>
             </ul>
-            <a class="pricing-btn" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Free%20plan%20access" data-email-link data-email-subject="AquaHub Free plan access">Ask about Free access</a>
+            <a class="pricing-btn" href="https://play.google.com/store/apps/details?id=com.aesprt.aquahub" data-owner-play-cta target="_blank" rel="noopener noreferrer"><img class="play-icon" src="assets/google-play-prism.svg" width="20" height="22" alt="" aria-hidden="true" /><span>Get AquaHub Owner</span></a>
           </article>
 
           <!-- Starter plan -->
@@ -412,15 +394,12 @@
             <div class="pricing-header">
               <h3>Starter</h3>
               <p>Delivery tools and customer ordering for one station.</p>
-              <div class="pricing-figure">
-                <data class="pricing-amount" data-price-amount value="19900">₱199</data>
-                <span class="pricing-period" data-price-period>/ month</span>
-              </div>
-              <span class="pricing-daily" data-price-note>Billed monthly</span>
+              <div class="pricing-figure"><data class="pricing-amount" data-price-amount value="19900">₱199</data><span class="pricing-period" data-price-period>/ month</span></div>
+              <span class="pricing-daily">Monthly subscription</span>
             </div>
             <ul class="pricing-features">
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -428,7 +407,7 @@
                 <span>Hanggang 300 orders bawat buwan</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -436,7 +415,7 @@
                 <span>Basic container tracking and CSV export</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -444,7 +423,7 @@
                 <span>Mobile ordering and delivery management when enabled for the station</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -453,7 +432,7 @@
               </li>
               <li><span>1 station · up to 30 products, 300 orders, and 100 customers per month</span></li>
             </ul>
-            <a class="pricing-btn" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Starter%20plan%20access" data-email-link data-email-subject="AquaHub Starter plan access">Ask about Starter access</a>
+            <a class="pricing-btn" href="https://play.google.com/store/apps/details?id=com.aesprt.aquahub" data-owner-play-cta target="_blank" rel="noopener noreferrer"><img class="play-icon" src="assets/google-play-prism.svg" width="20" height="22" alt="" aria-hidden="true" /><span>Get AquaHub Owner</span></a>
           </article>
 
           <!-- Business plan -->
@@ -462,15 +441,12 @@
             <div class="pricing-header">
               <h3>Business</h3>
               <p>More capacity and tools for a growing operation.</p>
-              <div class="pricing-figure">
-                <data class="pricing-amount" data-price-amount value="49900">₱499</data>
-                <span class="pricing-period" data-price-period>/ month</span>
-              </div>
-              <span class="pricing-daily" data-price-note>Billed monthly</span>
+              <div class="pricing-figure"><data class="pricing-amount" data-price-amount value="49900">₱499</data><span class="pricing-period" data-price-period>/ month</span></div>
+              <span class="pricing-daily">Monthly subscription</span>
             </div>
             <ul class="pricing-features">
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -478,7 +454,7 @@
                 <span>Mobile ordering, delivery management, and up to 10 riders</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -486,7 +462,7 @@
                 <span>Advanced reports and analytics with CSV, Excel, and PDF exports</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -494,7 +470,7 @@
                 <span>Promotions, expense tracking, and accounts receivable</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -502,7 +478,7 @@
                 <span>Up to 3 stations, 500 products, 10,000 orders, 2,000 customers, 10 riders, and 10 staff</span>
               </li>
             </ul>
-            <a class="pricing-btn" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Business%20plan%20access" data-email-link data-email-subject="AquaHub Business plan access">Ask about Business access</a>
+            <a class="pricing-btn" href="https://play.google.com/store/apps/details?id=com.aesprt.aquahub" data-owner-play-cta target="_blank" rel="noopener noreferrer"><img class="play-icon" src="assets/google-play-prism.svg" width="20" height="22" alt="" aria-hidden="true" /><span>Get AquaHub Owner</span></a>
           </article>
 
           <!-- Pro plan -->
@@ -510,15 +486,12 @@
             <div class="pricing-header">
               <h3>Pro</h3>
               <p>Advanced tools for multi-station operations.</p>
-              <div class="pricing-figure">
-                <data class="pricing-amount" data-price-amount value="99900">₱999</data>
-                <span class="pricing-period" data-price-period>/ month</span>
-              </div>
-              <span class="pricing-daily" data-price-note>Billed monthly</span>
+              <div class="pricing-figure"><data class="pricing-amount" data-price-amount value="99900">₱999</data><span class="pricing-period" data-price-period>/ month</span></div>
+              <span class="pricing-daily">Monthly subscription</span>
             </div>
             <ul class="pricing-features">
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -526,7 +499,7 @@
                 <span>Mobile ordering and delivery tools when enabled for each station</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -534,7 +507,7 @@
                 <span>Consolidated station reports, delivery analytics, and customer insights</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -542,7 +515,7 @@
                 <span>Up to 10 stations, 10,000 products, 100,000 orders, and 50,000 customers</span>
               </li>
               <li>
-                <svg viewBox="0 0 20 20" fill="currentColor">
+                <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false">
                   <path fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
                     clip-rule="evenodd" />
@@ -550,15 +523,11 @@
                 <span>Up to 100 riders and 100 staff</span>
               </li>
             </ul>
-            <a class="pricing-btn" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Pro%20plan%20access" data-email-link data-email-subject="AquaHub Pro plan access">Ask about Pro access</a>
+            <a class="pricing-btn" href="https://play.google.com/store/apps/details?id=com.aesprt.aquahub" data-owner-play-cta target="_blank" rel="noopener noreferrer"><img class="play-icon" src="assets/google-play-prism.svg" width="20" height="22" alt="" aria-hidden="true" /><span>Get AquaHub Owner</span></a>
           </article>
         </div>
 
-        <p class="pricing-note">
-          These are intended AquaHub plan catalogue prices, not a live checkout quote. Annual totals show the planned 20% discount.
-          Plan availability, actual price, payment, renewal, and cancellation terms are confirmed in Google Play where offered.
-          This page does not start a purchase.
-        </p>
+        <p class="pricing-note">These Philippine peso monthly reference prices reflect the current offers confirmed by AquaHub. The exact price, billing period, and renewal terms shown by Google Play control your purchase. Annual prices are shown in the app. This page does not start a purchase; test-track membership does not make paid subscriptions free.</p>
       </div>
     </section>
 
@@ -577,7 +546,7 @@
           <details class="faq-item" open>
             <summary class="faq-question">
               <span>Who is AquaHub for?</span>
-              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </summary>
@@ -589,19 +558,19 @@
           <details class="faq-item">
             <summary class="faq-question">
               <span>Does AquaHub work without an internet connection?</span>
-              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </summary>
             <div class="faq-answer">
-              <p>Many Owner workflows are local-first and synchronize when connectivity returns. Mobile ordering requires an active station link and its online ordering service.</p>
+              <p>The public Owner release requires an internet connection to complete checkout and confirm sales. Offline checkout is not available. Some previously loaded information may remain on your device, but it is not a new confirmed sale. Browser ordering also requires internet and an active station ordering link.</p>
             </div>
           </details>
 
           <details class="faq-item">
             <summary class="faq-question">
               <span>Which plans include container tracking?</span>
-              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </summary>
@@ -613,7 +582,7 @@
           <details class="faq-item">
             <summary class="faq-question">
               <span>Gumagawa o nagbebenta ba ng drinking water ang AquaHub?</span>
-              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </summary>
@@ -625,24 +594,24 @@
           <details class="faq-item">
             <summary class="faq-question">
               <span>How do I confirm plan price and billing?</span>
-              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </summary>
             <div class="faq-answer">
-              <p>The plan amounts on this page are the current intended catalogue prices. Where a paid plan is offered, check Google Play for the available plan, exact checkout price, billing period, renewal, and cancellation terms. This website does not process subscriptions.</p>
+              <p>Compare plan features here, then review the available plan, exact price, billing period, renewal, and cancellation terms in Google Play before purchasing. The website shows monthly reference prices; annual pricing and available offers are shown in the app. This website does not process subscriptions.</p>
             </div>
           </details>
 
           <details class="faq-item">
             <summary class="faq-question">
-              <span>Puwede bang mag-request ng account at data deletion?</span>
-              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <span>Paano mag-request ng account at data deletion?</span>
+              <svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true" focusable="false">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </summary>
             <div class="faq-answer">
-              <p>Oo. Available ang account deletion sa loob ng apps o sa aming <a href="account-deletion.html" style="color:var(--brand); text-decoration:underline;">Account Deletion page</a>.</p>
+              <p>Para sa AquaHub Owner, puwede mong burahin ang account sa Settings ng app o humiling sa aming <a href="account-deletion.html" style="color:var(--brand); text-decoration:underline;">Account Deletion page</a>. Kung wala kang access sa app, sundin ang email request doon. Para sa ibang AquaHub account, makipag-ugnayan sa privacy support.</p>
             </div>
           </details>
         </div>
@@ -655,9 +624,9 @@
         <div class="home-final-copy">
           <p class="home-kicker">BRING THE FLOW TO YOUR STATION</p>
           <h2 id="final-title">A clearer day starts with the Owner app.</h2>
-          <p>Bring your counter, orders, inventory, customers, and reporting into a station-focused workflow. Compare the plan catalogue, then join the Owner app when access is available to you.</p>
-          <div class="home-final-actions"><button class="home-action home-action-primary is-unavailable" type="button" data-owner-play-cta disabled><span>Get Owner App on Google Play</span></button><a class="home-action home-action-secondary" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Owner%20closed%20testing%20access%20request" data-email-link data-email-subject="AquaHub Owner closed testing access request">Ask for tester access <span aria-hidden="true">↗</span></a></div>
-          <p class="owner-availability"><span class="availability-dot" aria-hidden="true"></span><strong>Closed testing.</strong> Owner access is currently limited to approved testers.</p>
+          <p>Bring your counter, orders, inventory, customers, and reporting into a station-focused workflow. Compare the plan catalogue, then get AquaHub Owner through Google Play. Internet is required for checkout.</p>
+          <div class="home-final-actions"><a class="home-action home-action-primary" href="https://play.google.com/store/apps/details?id=com.aesprt.aquahub" data-owner-play-cta target="_blank" rel="noopener noreferrer" aria-label="Get AquaHub Owner on Google Play (opens in a new tab)"><img class="play-icon" src="assets/google-play-prism.svg" width="20" height="22" alt="" aria-hidden="true" /><span>Get AquaHub Owner</span></a><a class="home-action home-action-secondary" href="https://play.google.com/apps/testing/com.aesprt.aquahub" target="_blank" rel="noopener noreferrer">Join open testing <span aria-hidden="true"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10" /></svg></span></a></div>
+          <p class="owner-availability"><span class="availability-dot" aria-hidden="true"></span><strong>Online-only release.</strong> Google Play controls test enrollment and download availability. Paid subscriptions use real payments unless you use a configured Google Play license-test payment method.</p>
         </div>
         <div class="home-final-art" aria-hidden="true"><span class="final-art-ring"></span><img src="assets/landing/water-sculpture.webp" width="1536" height="1024" loading="lazy" decoding="async" alt="" /><span class="final-art-word">AquaHub</span></div>
       </div>
@@ -699,7 +668,7 @@
             <button class="newsletter-submit" type="submit" data-newsletter-submit disabled>
               <span class="newsletter-spinner" aria-hidden="true"></span>
               <span data-newsletter-label>Subscribe to Updates</span>
-              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M3.5 10a.75.75 0 0 1 .75-.75h9.69L10.22 5.53a.75.75 0 1 1 1.06-1.06l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06l3.72-3.72H4.25A.75.75 0 0 1 3.5 10Z"/></svg>
+              <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3.5 10a.75.75 0 0 1 .75-.75h9.69L10.22 5.53a.75.75 0 1 1 1.06-1.06l5 5a.75.75 0 0 1 0 1.06l-5 5a.75.75 0 1 1-1.06-1.06l3.72-3.72H4.25A.75.75 0 0 1 3.5 10Z"/></svg>
             </button>
             <p class="newsletter-status" data-newsletter-status role="status" aria-live="polite" aria-atomic="true"></p>
           </form>
@@ -724,6 +693,7 @@
       <div class="footer-col">
         <h4>Product</h4>
         <ul class="footer-links">
+          <li><a href="https://play.google.com/store/apps/details?id=com.aesprt.aquahub" data-owner-play-cta target="_blank" rel="noopener noreferrer">Get AquaHub Owner</a></li>
           <li><a href="#mobile-ordering">Mobile Ordering</a></li>
           <li><a href="#solutions">Why AquaHub</a></li>
           <li><a href="#features">Features</a></li>
@@ -752,7 +722,7 @@
     </div>
 
     <div class="container footer-bottom">
-      <span>© <span data-year></span> AquaHub. All rights reserved.</span>
+      <span>© <span data-year>2026</span> AquaHub. All rights reserved.</span>
           <span>Para sa Philippine water-refilling stations.</span>
     </div>
   </footer>
@@ -761,7 +731,7 @@
   <script src="newsletter-config.js?v=20261010-reach" defer></script>
   <script src="newsletter-utils.js?v=20261010-reach" defer></script>
   <script src="newsletter.js?v=20261010-reach" defer></script>
-  <script src="main.js?v=20261010-redesign" defer></script>
+  <script src="main.js?v=20261025-analytics" defer></script>
   <script src="motion.js?v=20261010-redesign" defer></script>
 </body>
 

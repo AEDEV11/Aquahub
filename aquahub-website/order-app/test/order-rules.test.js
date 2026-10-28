@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  calculateCartBreakdown,
   calculateCartSubtotal,
   confirmedOrderingAvailability,
   deliveryLocationError,
@@ -56,8 +57,33 @@ test("quantity promotions respect minimum quantity and active time window", () =
   assert.equal(effectiveProductPrice(product, 3, 10_000), 12000);
 });
 
-test("payment choices contain only station-enabled methods and never invent cash", () => {
-  const station = { cashPaymentEnabled: false, codPaymentEnabled: true, gcashPaymentEnabled: false, mayaPaymentEnabled: true };
+test("quantity-break percentage discounts apply only at the configured quantity", () => {
+  const product = {
+    priceCentavos: 12000,
+    promotionIsActive: true,
+    promotionType: "QUANTITY_BREAK",
+    promotionPercentBps: 2000,
+    promotionMinimumQuantity: 3,
+    promotionStartsAt: 1_000,
+    promotionEndsAt: 9_000,
+  };
+  assert.equal(effectiveProductPrice(product, 2, 5_000), 12000);
+  assert.equal(effectiveProductPrice(product, 3, 5_000), 9600);
+  assert.equal(effectiveProductPrice(product, 3, 10_000), 12000);
+});
+
+test("pickup offers enabled cash, account balance and provider methods", () => {
+  const station = { cashPaymentEnabled: true, accountBalanceEnabled: true, codPaymentEnabled: true, gcashPaymentEnabled: true, mayaPaymentEnabled: true };
+  assert.deepEqual(guestPaymentMethods(station, "PICKUP").map((method) => method.value), ["CASH", "CLIENT_ACCOUNT", "GCASH", "MAYA"]);
+});
+
+test("delivery offers COD and enabled providers, never cash or account balance", () => {
+  const station = { cashPaymentEnabled: true, accountBalanceEnabled: true, codPaymentEnabled: true, gcashPaymentEnabled: false, mayaPaymentEnabled: true };
+  assert.deepEqual(guestPaymentMethods(station, "DELIVERY").map((method) => method.value), ["COD", "MAYA"]);
+});
+
+test("payment choices contain only enabled methods and never invent cash", () => {
+  const station = { cashPaymentEnabled: false, accountBalanceEnabled: false, codPaymentEnabled: true, gcashPaymentEnabled: false, mayaPaymentEnabled: true };
   assert.deepEqual(guestPaymentMethods(station, "PICKUP").map((method) => method.value), ["MAYA"]);
   assert.deepEqual(guestPaymentMethods(station, "DELIVERY").map((method) => method.value), ["COD", "MAYA"]);
   assert.deepEqual(guestPaymentMethods({ ...station, mayaPaymentEnabled: false }, "PICKUP"), []);
@@ -69,6 +95,18 @@ test("cart totals use discounted per-unit prices and integer centavos", () => {
     { product: { priceCentavos: 1250 }, quantity: 1 },
   ];
   assert.equal(calculateCartSubtotal(lines, 1_000), 9650);
+});
+
+test("cart breakdown shows regular subtotal, promotion savings and discounted subtotal", () => {
+  const lines = [
+    { product: { priceCentavos: 5000, promotionIsActive: true, promotionType: "FIXED_PRICE", promotionalPriceCentavos: 4200 }, quantity: 2 },
+    { product: { priceCentavos: 1250 }, quantity: 1 },
+  ];
+  assert.deepEqual(calculateCartBreakdown(lines, 1_000), {
+    regularSubtotal: 11250,
+    discountCentavos: 1600,
+    discountedSubtotal: 9650,
+  });
 });
 
 test("delivery location validation requires a verified pin only when radius rules need it", () => {

@@ -27,6 +27,23 @@ data class SupabaseContainerRow(
     @SerialName("updated_at") val updatedAt: String
 )
 
+@Serializable
+data class SupabaseContainerMovementRow(
+    val id: String,
+    @SerialName("firebase_id") val legacyId: String? = null,
+    @SerialName("client_operation_id") val operationId: String? = null,
+    @SerialName("station_id") val stationId: String,
+    @SerialName("customer_id") val customerId: String? = null,
+    @SerialName("order_id") val orderId: String? = null,
+    @SerialName("customer_name") val customerName: String? = null,
+    @SerialName("movement_type") val movementType: String,
+    val quantity: Int,
+    @SerialName("container_size") val containerSize: String,
+    val notes: String? = null,
+    @SerialName("created_at") val createdAt: String,
+    @SerialName("deleted_at") val deletedAt: String? = null
+)
+
 /** Applies bottle movements atomically and reads the canonical station inventory. */
 class SupabaseContainerDataSource {
     private val supabase get() = SupabaseClientProvider.client
@@ -36,6 +53,25 @@ class SupabaseContainerDataSource {
             filter { eq("station_id", stationId) }
             order("size_label", order = io.github.jan.supabase.postgrest.query.Order.ASCENDING)
         }.decodeList()
+
+    /** Reads the complete immutable movement ledger in stable, bounded pages. */
+    suspend fun movements(stationId: String): List<SupabaseContainerMovementRow> = buildList {
+        var offset = 0L
+        while (true) {
+            val page = supabase.from("container_movements").select {
+                filter {
+                    eq("station_id", stationId)
+                    exact("deleted_at", null)
+                }
+                order("created_at", order = io.github.jan.supabase.postgrest.query.Order.ASCENDING)
+                order("id", order = io.github.jan.supabase.postgrest.query.Order.ASCENDING)
+                range(offset, offset + MOVEMENT_PAGE_SIZE - 1)
+            }.decodeList<SupabaseContainerMovementRow>()
+            addAll(page)
+            if (page.size < MOVEMENT_PAGE_SIZE) break
+            offset += MOVEMENT_PAGE_SIZE
+        }
+    }
 
     suspend fun ensureContainer(
         stationId: String,
@@ -92,4 +128,8 @@ class SupabaseContainerDataSource {
 
     private fun moneyToCentavos(value: Double): Long =
         Math.round(value * 100.0).also { require(value.isFinite() && value >= 0) }
+
+    private companion object {
+        const val MOVEMENT_PAGE_SIZE = 500L
+    }
 }

@@ -1,0 +1,27 @@
+# AquaHub Owner Edge Function Deployment Report — 2026-10-17
+
+## Production snapshot
+
+Project: `pfkxrggexueltytxtqil` (active/healthy). Initial live inventory showed 13 active functions and `offline-pos` missing. After the user explicitly authorized the `offline-pos` deployment, a fresh inventory showed 14 active functions. The latest recheck shows all 14 active, with `offline-pos` at version 2 and `verify_jwt=true`. All 14 local function folders have a corresponding active production slug; no other local function name is missing. The deployed `index.ts` was retrieved and compared byte-for-byte with the local entrypoint (15,789 characters; exact match). The local `delete-account` source has a separate un-deployed change while production v19 remains active; it was not part of this batch.
+
+One production function was deployed: `offline-pos` only. No database migrations, secrets/settings, other Edge Functions, website, or Play Console resources were changed. No business mutation request was sent to the function. The connected Supabase tool cannot inspect Edge secret presence/configuration; secret values were never read or displayed. `supabase/config.toml` has no explicit `offline-pos` entry, so it was deployed with `verify_jwt=true`; the handler also authenticates the bearer token through Supabase Auth. A read-only live SQL check confirmed six offline POS tables and seven related routines in production.
+
+## Local implementation changes
+
+- `offline-pos/index.ts`: setting the Edge secret `OFFLINE_POS_ENABLED=false` prevents issuing new grants while allowing commits covered by already-issued valid grants. This deployment did not change Edge secrets, and the tool cannot verify whether that setting is currently configured. The handler requires a valid signing pair and matching client fingerprint before any stock reservation; missing/mismatched keys fail closed. Do not assume the grant pause is active. The switch is a rollback control to avoid discarding previously authorized sales. It does not replace testing signature verification, DB transaction atomicity, idempotency, stock leases, revoked staff, expiry, altered payloads, and response loss.
+- `delete-account/index.ts`: validates the authenticated Owner role and, when an active marketing consent exists, disables it through the user-scoped preference RPC before proceeding with account deletion. This queues provider removal. The sequence remains non-transactional; a provider/database failure can leave a partially completed request. Failure injection, safe retry, and an operator recovery procedure are required before deployment.
+
+## Signing key setup
+
+`OFFLINE_POS_VERIFY_PUBLIC_KEY` for Android is standard Base64 X.509 SPKI DER for the same P-256 pair the function reads as `OFFLINE_POS_SIGNING_PRIVATE_JWK` and `OFFLINE_POS_SIGNING_PUBLIC_JWK`. The function signs with the private JWK and self-checks the public JWK before reserving stock; it compares the Android-supplied SPKI fingerprint with that server public key. On the latest recheck, the Android key is configured locally (value not printed) and the production AAB build passes. Connected Supabase tools still cannot inspect the Edge secret values, so the server/client key match remains unverified. Do not send a private JWK in chat or place it in the Android app.
+
+## Tests executed
+
+- `/tmp/aquahub-deno/bin/deno check supabase/functions/*/index.ts` — all 14 entrypoints passed typecheck.
+- `/tmp/aquahub-deno/bin/deno test --allow-env --allow-net --allow-read=supabase/functions supabase/functions` — 87 passed, 0 failed. This is a function unit suite, not a complete production integration matrix. Prior disposable end-to-end coverage is described below.
+
+Prior disposable evidence documented in `OWNER_TEST_RESULTS.md` and `OWNER_BACKEND_SECURITY_AUDIT.md` includes 226 SQL assertions across 22 files, a real Android offline sale/force-stop/replay path through the disposable Edge function and PostgreSQL, and a single lease-vs-guest-order race. The current temporary environment is gone; full expiry/revocation/clock/two-device cases remain unverified. The fresh live function inventory and schema queries were read-only.
+
+## Deployment result and remaining gate
+
+The deployment was completed earlier; the latest live check confirms version 2, `ACTIVE`, `verify_jwt=true`, and an exact source match with the local entrypoint. No database migration was required. Deployment is not equivalent to end-to-end functional verification: no production authorization/sale request was sent because the authorize path may register a device or reserve inventory. The Android verifier key and upload signing configuration are now present locally and the signed production AAB build succeeds. The Supabase tools cannot inspect whether the corresponding Edge signing secrets are present or match the Android key. The function checks signing configuration before reserving stock, so missing/mismatched secrets make authorization return 503. Verify server secret/key pairing, run the remaining isolated failure tests, diagnose the recurring marketing 503s, and confirm rollback/recovery readiness before release. `OFFLINE_POS_ENABLED=false` can pause new grants while preserving commits for valid grants already issued, but this recheck did not set or verify that secret. Do not include the separate local `delete-account` change, expose a service-role key in Android, or weaken authorization.

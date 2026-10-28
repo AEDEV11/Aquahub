@@ -19,7 +19,7 @@ coroutines = "1.11.0"
 g-font="1.12.1"
 g-services="4.5.0"
 firebase-crashlytics-plugin="3.0.8"
-firebase-bom="35.0.1"
+firebase-bom="35.0.2"
 work = "2.12.0"
 supabase = "3.8.0"
 ktor = "3.6.0"
@@ -87,7 +87,7 @@ androidx-credentials-play-services-auth = { group = "androidx.credentials", name
 googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 billing = { group = "com.android.billingclient", name = "billing", version.ref = "billing" }
 billing-ktx = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
-play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version = "20.0.0" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version = "20.1.0" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version = "21.4.0" }
 google-places = { group = "com.google.android.libraries.places", name = "places", version = "6.0.2" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version = "9.0.1" }
@@ -101,7 +101,7 @@ supabase-auth = { group = "io.github.jan-tennert.supabase", name = "auth-kt" }
 supabase-postgrest = { group = "io.github.jan-tennert.supabase", name = "postgrest-kt" }
 supabase-storage = { group = "io.github.jan-tennert.supabase", name = "storage-kt" }
 supabase-functions = { group = "io.github.jan-tennert.supabase", name = "functions-kt" }
-ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
+ktor-client-okhttp = { group = "io.ktor", name = "ktor-client-okhttp", version.ref = "ktor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -1,0 +1,47 @@
+[
+  {
+    "path": "order/aquahub-logo.png",
+    "matches_local": true,
+    "sha256": "e7d00284a315419e72f28bc29674429ed19e06ab36fc6369ebd6ca2615879e7a"
+  },
+  {
+    "path": "order/index.html",
+    "matches_local": true,
+    "sha256": "1ae04b5c3c33dbef36adcd45220d6ca5d7c503fcd110ea6a04087928ed61fbcb"
+  },
+  {
+    "path": "order/fonts/LICENSE-Material-Design-Icons.txt",
+    "matches_local": true,
+    "sha256": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+  },
+  {
+    "path": "order/fonts/OFL-Plus-Jakarta-Sans.txt",
+    "matches_local": true,
+    "sha256": "995c7199cab65954f545996326755daee7b63cc6b42b06c13da1f9502ab08a99"
+  },
+  {
+    "path": "order/fonts/material-symbols-rounded.woff2",
+    "matches_local": true,
+    "sha256": "824c23e66420c905ecd3d9c77601ac8395e09323dd0312bb5aad7fc38a71cb20"
+  },
+  {
+    "path": "order/fonts/plus-jakarta-sans-latin-ext.woff2",
+    "matches_local": true,
+    "sha256": "38e3b8fd8045048eb311d90170a4429ed2c8f405852dc3d91b5af8452758703f"
+  },
+  {
+    "path": "order/fonts/plus-jakarta-sans-latin.woff2",
+    "matches_local": true,
+    "sha256": "153fc85b70298beeb1d61a5f723331649e7f23bb77302a66e61cb3e2fbdb5e79"
+  },
+  {
+    "path": "order/assets/index-CLwHmUqK.js",
+    "matches_local": true,
+    "sha256": "23b10479dafd3db3eb1bfedde0dc2fc5442ffb58d254f14ce7d1d8df5bf7cf8f"
+  },
+  {
+    "path": "order/assets/index-BdQFCPCr.css",
+    "matches_local": true,
+    "sha256": "8e3479e5b8934d23940a54d6c7777a4dff81e839b0a624fc86e3708de72177f8"
+  }
+]

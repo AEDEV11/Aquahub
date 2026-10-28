@@ -22,11 +22,14 @@ export function effectiveProductPrice(product, quantity = 1, now = Date.now()) {
     || (product.promotionStartsAt != null && Number(product.promotionStartsAt) > now)
     || (product.promotionEndsAt != null && Number(product.promotionEndsAt) < now)
     || quantity < minimum) return price;
-  if (["FIXED_PRICE", "QUANTITY_BREAK"].includes(product.promotionType) && product.promotionalPriceCentavos != null) {
+  if (product.promotionType === "FIXED_PRICE" && product.promotionalPriceCentavos != null) {
     return Math.min(price, Number(product.promotionalPriceCentavos));
   }
-  if (product.promotionType === "PERCENTAGE" && Number(product.promotionPercentBps) > 0) {
+  if (["PERCENTAGE", "QUANTITY_BREAK"].includes(product.promotionType) && Number(product.promotionPercentBps) > 0) {
     return Math.floor(price * (10_000 - Number(product.promotionPercentBps)) / 10_000);
+  }
+  if (product.promotionType === "QUANTITY_BREAK" && product.promotionalPriceCentavos != null) {
+    return Math.min(price, Number(product.promotionalPriceCentavos));
   }
   return price;
 }
@@ -34,10 +37,15 @@ export function effectiveProductPrice(product, quantity = 1, now = Date.now()) {
 export function guestPaymentMethods(station, mode = "PICKUP") {
   if (!station) return [];
   const options = [];
-  if (station.cashPaymentEnabled) options.push({
+  if (mode === "PICKUP" && station.cashPaymentEnabled) options.push({
     value: "CASH",
-    label: mode === "DELIVERY" ? "Cash" : "Cash at pickup",
+    label: "Cash",
     detail: "Pay the station when your order is handed over.",
+  });
+  if (mode === "PICKUP" && station.accountBalanceEnabled) options.push({
+    value: "CLIENT_ACCOUNT",
+    label: "Account balance",
+    detail: "Charge this order to your existing station customer account.",
   });
   if (mode === "DELIVERY" && station.codPaymentEnabled) options.push({
     value: "COD",
@@ -71,9 +79,21 @@ export function deliveryLocationError({ mode, radiusKm, address, placeId, latitu
 
 function paymentDetail(name, account) {
   const details = [name, account].filter(Boolean).join(" · ");
-  return details ? `The station will confirm payment instructions (${details}).` : "The station will confirm payment instructions.";
+  return details
+    ? `Send the order total to ${details}, then submit the reference and screenshot.`
+    : "The station will confirm payment instructions.";
 }
 
 export function calculateCartSubtotal(lines, now = Date.now()) {
   return lines.reduce((sum, line) => sum + effectiveProductPrice(line.product, line.quantity, now) * line.quantity, 0);
+}
+
+export function calculateCartBreakdown(lines, now = Date.now()) {
+  const regularSubtotal = lines.reduce((sum, line) => sum + Number(line.product?.priceCentavos || 0) * line.quantity, 0);
+  const discountedSubtotal = calculateCartSubtotal(lines, now);
+  return {
+    regularSubtotal,
+    discountCentavos: Math.max(0, regularSubtotal - discountedSubtotal),
+    discountedSubtotal,
+  };
 }

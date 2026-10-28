@@ -1,0 +1,11 @@
+# Disposable QA resource manifest — 2026-10-17
+
+user_id=7edc6932-a014-48a8-87c6-05ffdb931e91
+email_domain=example.test
+state=created-for-local-function-auth-crypto-test
+
+Business resources created: none.
+Test station / organization / products: none.
+Orders / payments / movements / grants / leases / offline operations: none.
+Matching local profile after deletion: 0 rows.
+Production resources created or changed: none.

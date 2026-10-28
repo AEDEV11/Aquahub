@@ -537,8 +537,8 @@ class RoomPaymentRepository(
 
     private fun PaymentEntity.deliveryPaymentProofObjectPath(): String? = metadataJson?.let { raw ->
         runCatching {
-            kotlinx.serialization.json.Json.parseToJsonElement(raw)
-                .jsonObject["delivery_payment_proof_object_path"]
+            val metadata = kotlinx.serialization.json.Json.parseToJsonElement(raw).jsonObject
+            (metadata["payment_proof_object_path"] ?: metadata["delivery_payment_proof_object_path"])
                 ?.jsonPrimitive?.contentOrNull
         }.getOrNull()
     }

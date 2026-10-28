@@ -4,6 +4,7 @@ import com.aesprt.aquahub.core.designsystem.components.SubscriptionGate
 import com.aesprt.aquahub.domain.model.SubscriptionFeature
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -167,6 +168,29 @@ fun AppNavGraph(
         }
 
         composable(Screen.MainContainer.route) {
+            val previousRoute = navController.previousBackStackEntry?.destination?.route
+            val staleAuthRoute = previousRoute?.takeIf {
+                it in setOf(
+                    Screen.Login.route,
+                    Screen.IntroOnboarding.route,
+                    Screen.Splash.route,
+                    "registration_flow",
+                    Screen.Register.route,
+                    Screen.StationSetup.route,
+                    Screen.Subscription.route
+                )
+            }
+            LaunchedEffect(staleAuthRoute) {
+                if (staleAuthRoute != null) {
+                    // A completed registration flow can leave Login or
+                    // onboarding underneath MainContainer. Replace that stack
+                    // tail so Back cannot return to a signed-in auth screen.
+                    navController.navigate(Screen.MainContainer.route) {
+                        popUpTo(staleAuthRoute) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            }
             MainContainerScreen(rootNavController = navController)
         }
 

@@ -511,6 +511,9 @@ interface ContainerTransactionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: ContainerTransactionEntity): Long
+
+    @androidx.room.Update
+    suspend fun updateTransaction(transaction: ContainerTransactionEntity)
 }
 
 @Dao

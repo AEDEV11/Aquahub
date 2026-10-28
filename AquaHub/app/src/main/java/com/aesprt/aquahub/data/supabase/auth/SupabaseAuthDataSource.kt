@@ -10,9 +10,12 @@ import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -101,8 +104,16 @@ class SupabaseAuthDataSource {
     val currentUserEmailVerified: Boolean
         get() = supabase.auth.currentUserOrNull()?.emailConfirmedAt != null
 
-    suspend fun requestPhoneOtp(phone: String) {
-        supabase.auth.signInWith(OTP) { this.phone = PhoneNumberNormalizer.normalizePhilippines(phone) }
+    suspend fun requestPhoneOtp(phone: String, createUser: Boolean = true) {
+        val normalizedPhone = PhoneNumberNormalizer.normalizePhilippines(phone)
+        // Login may follow an offline logout, where the SDK's remote sign-out
+        // request failed before it removed the persisted local session.
+        supabase.auth.clearSession()
+        _state.value = AuthSessionState.SIGNED_OUT
+        supabase.auth.signInWith(OTP) {
+            this.phone = normalizedPhone
+            this.createUser = createUser
+        }
     }
 
     suspend fun verifyPhoneOtp(phone: String, token: String, displayName: String? = null): SupabaseProfileRecord {
@@ -114,7 +125,9 @@ class SupabaseAuthDataSource {
                 phone = normalizedPhone,
                 token = token.trim()
             )
-        } catch (error: Throwable) {
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
             throw PhoneOtpRejectedException(error)
         }
         supabase.auth.updateUser {
@@ -125,7 +138,9 @@ class SupabaseAuthDataSource {
         }
         return try {
             provisionVerifiedProfile()
-        } catch (error: Throwable) {
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
             throw PhoneProfileProvisioningException(error)
         }
     }
@@ -260,8 +275,14 @@ class SupabaseAuthDataSource {
     }
 
     suspend fun signOut() {
-        runCatching { supabase.auth.signOut() }
-        _state.value = AuthSessionState.SIGNED_OUT
+        try {
+            bestEffortSignOut(
+                signOut = { supabase.auth.signOut() },
+                clearLocalSession = { supabase.auth.clearSession() }
+            )
+        } finally {
+            _state.value = AuthSessionState.SIGNED_OUT
+        }
     }
 
     suspend fun deleteSupabaseSession() = signOut()
@@ -270,6 +291,23 @@ class SupabaseAuthDataSource {
         val id = requireNotNull(currentUserId) { "Supabase did not return an authenticated user." }
         _state.value = AuthSessionState.AUTHENTICATED
         return id
+    }
+}
+
+internal suspend fun bestEffortSignOut(
+    signOut: suspend () -> Unit,
+    clearLocalSession: suspend () -> Unit
+) {
+    try {
+        signOut()
+    } catch (error: CancellationException) {
+        throw error
+    } catch (_: Exception) {
+        // A failed remote revocation must not leave this device signed in.
+    } finally {
+        withContext(NonCancellable) {
+            clearLocalSession()
+        }
     }
 }
 

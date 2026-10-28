@@ -3,6 +3,8 @@ package com.aesprt.aquahub.feature.orders.walkin
 import com.aesprt.aquahub.domain.model.Product
 import com.aesprt.aquahub.domain.model.ProductPromotion
 import com.aesprt.aquahub.domain.model.PromotionType
+import com.aesprt.aquahub.domain.model.OfflinePosStatus
+import com.aesprt.aquahub.core.config.canSubmitWalkInSale
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -57,5 +59,21 @@ class WalkInSaleUiStateTest {
         assertFalse(canSelectWalkInDelivery(deliveryAccessResolved = false, deliveryManagementAllowed = true))
         assertFalse(canSelectWalkInDelivery(deliveryAccessResolved = true, deliveryManagementAllowed = false))
         assertTrue(canSelectWalkInDelivery(deliveryAccessResolved = true, deliveryManagementAllowed = true))
+    }
+
+    @Test
+    fun `online-only release exposes no offline payment or checkout path`() {
+        val state = WalkInSaleUiState(
+            isOnline = false,
+            offlinePosEnabled = false,
+            offlinePosStatus = OfflinePosStatus(state = "READY"),
+        )
+
+        assertTrue(state.availablePaymentMethods.isEmpty())
+        assertFalse(canSubmitWalkInSale(
+            isOnline = state.isOnline,
+            offlinePosEnabled = state.offlinePosEnabled,
+            hasValidOfflineLease = state.offlinePosStatus.canCreateOfflineSale,
+        ))
     }
 }

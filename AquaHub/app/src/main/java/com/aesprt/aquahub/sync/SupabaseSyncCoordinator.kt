@@ -83,6 +83,17 @@ class SupabaseSyncCoordinator(
                 SyncSummary(permanentFailures = 1)
             }
         }
+        try {
+            summary += SyncSummary(pulled = pendingMutationWriter.refreshContainerMovements())
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            summary += if (error.isTransientSyncFailure()) {
+                SyncSummary(retryableFailures = 1)
+            } else {
+                SyncSummary(permanentFailures = 1)
+            }
+        }
         summary
       }
     }

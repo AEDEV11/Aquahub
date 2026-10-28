@@ -6,7 +6,7 @@ import org.junit.Test
 class AccountDeletionIdentityTest {
     @Test
     fun directDeletionIsRejectedWithoutAReauthenticationMarker() {
-        assertThrows(IllegalStateException::class.java) {
+        assertThrows(AccountDeletionReauthenticationRequiredException::class.java) {
             requireDeletionIdentity(reauthenticatedUid = null, currentUid = "owner-a")
         }
     }

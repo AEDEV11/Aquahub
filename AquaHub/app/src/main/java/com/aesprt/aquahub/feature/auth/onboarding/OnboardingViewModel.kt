@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.CancellationException
 
 data class OnboardingUiState(
     // Step 3: Subscription
@@ -335,6 +336,7 @@ class OnboardingViewModel(
             }
                 .onSuccess { _uiState.update { it.copy(isLoading = false, phoneVerified = true) } }
                 .onFailure { error ->
+                    if (error is CancellationException) throw error
                     _uiState.update {
                         it.copy(
                             isLoading = false,

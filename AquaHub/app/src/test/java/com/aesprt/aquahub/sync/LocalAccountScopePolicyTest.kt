@@ -66,6 +66,25 @@ class LocalAccountScopePolicyTest {
     }
 
     @Test
+    fun `unresolved offline receipts prevent logout cleanup and account switching`() {
+        val outstanding = countOutstandingLocalOperations(syncOperations = 0, offlinePosOperations = 2)
+
+        assertEquals(2, outstanding)
+        assertFalse(shouldClearLocalAccountCacheAfterLogout(outstanding))
+        assertEquals(
+            AccountScopeAction.BLOCK_PENDING_WORK,
+            decideAccountScopeAction(
+                boundUid = "owner-a",
+                requestedUid = "owner-b",
+                outstandingWork = outstanding,
+                hasMatchingLocalOwner = false,
+                hasLocalBusinessData = true,
+                hasBoundLocalOwner = true,
+            ),
+        )
+    }
+
+    @Test
     fun `same account keeps existing cache and outbox`() {
         assertEquals(
             AccountScopeAction.KEEP,

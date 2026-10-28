@@ -11,6 +11,7 @@ import com.aesprt.aquahub.data.local.mapper.toEntity
 import com.aesprt.aquahub.data.supabase.catalog.SupabaseCatalogDataSource
 import com.aesprt.aquahub.data.supabase.catalog.SupabaseCustomerRow
 import com.aesprt.aquahub.data.supabase.catalog.SupabaseCustomerAddressRow
+import com.aesprt.aquahub.data.supabase.inventory.SupabaseContainerDataSource
 import com.aesprt.aquahub.domain.model.Customer
 import com.aesprt.aquahub.domain.model.CustomerAddress
 import com.aesprt.aquahub.domain.repository.CustomerRepository
@@ -39,7 +40,9 @@ class RoomCustomerRepository(
     private val syncQueue: SyncQueueWriter,
     private val syncDao: SyncDao,
     private val stationDao: StationDao,
-    private val supabaseCatalog: SupabaseCatalogDataSource
+    private val supabaseCatalog: SupabaseCatalogDataSource,
+    private val supabaseContainer: SupabaseContainerDataSource,
+    private val containerMovementPullApplier: ContainerMovementPullApplier
 ) : CustomerRepository {
 
     override fun observeCustomers(stationId: Long): Flow<List<Customer>> =
@@ -431,6 +434,12 @@ class RoomCustomerRepository(
                 recordMetadata(SyncResourceType.CUSTOMER_ADDRESS, localId, row.id, stationId, System.currentTimeMillis())
             }
         }
+        // Customer rows and their remote-ID mappings must be restored before
+        // loan movements so outstanding-bottle balances reconnect after logout.
+        containerMovementPullApplier.apply(
+            stationId = stationId,
+            rows = supabaseContainer.movements(stationRemoteId)
+        )
     }
 
     private fun String?.toMillisOrNull(): Long? = this?.let { runCatching { Instant.parse(it).toEpochMilli() }.getOrNull() }

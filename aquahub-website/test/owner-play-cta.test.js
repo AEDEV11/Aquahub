@@ -11,19 +11,35 @@ function visibleText(markup) {
   return markup.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-test('Owner Play CTAs explain closed-test availability without a dead download link', () => {
-  const buttons = [...homepage.matchAll(/<button\b(?=[^>]*\bdata-owner-play-cta\b)([^>]*)>([\s\S]*?)<\/button>/gi)];
-  assert.ok(buttons.length >= 1);
-
-  for (const [, attributes, content] of buttons) {
-    assert.match(attributes, /\sdisabled(?:\s|=|$)/i);
-    assert.equal(visibleText(content), 'Get Owner App on Google Play');
+test('Owner download links work without JavaScript and target the exact Play package', () => {
+  const links = [...homepage.matchAll(/<a\b(?=[^>]*\bdata-owner-play-cta\b)([^>]*)>([\s\S]*?)<\/a>/gi)];
+  assert.ok(links.length >= 4, 'header, hero, final section, and footer');
+  for (const [, attributes, content] of links) {
+    assert.match(attributes, /href="https:\/\/play\.google\.com\/store\/apps\/details\?id=com\.aesprt\.aquahub"/);
+    assert.match(attributes, /target="_blank"/);
+    assert.match(attributes, /rel="noopener noreferrer"/);
+    assert.equal(visibleText(content), 'Get AquaHub Owner');
   }
+  assert.doesNotMatch(homepage, /<button\b(?=[^>]*data-owner-play-cta)/i);
+  assert.doesNotMatch(homepage, /Closed testing|limited to approved testers/i);
+  assert.match(homepage, /href="https:\/\/play\.google\.com\/apps\/testing\/com\.aesprt\.aquahub"/);
+  assert.match(homepage, /Google Play release availability/);
+});
 
-  assert.match(homepage, /Closed testing/i);
-  const emailLinks = [...homepage.matchAll(/<a\b(?=[^>]*href="mailto:)([^>]*)>([\s\S]*?)<\/a>/gi)];
-  assert.ok(emailLinks.some(([, , content]) => /test(?:er|ing) access/i.test(visibleText(content))));
-  assert.doesNotMatch(homepage, /<a\b(?=[^>]*\bdata-owner-play-cta\b)[^>]*href="(?:#|mailto:)/i);
+test('Owner CTA initialization updates real links without rebuilding their content', () => {
+  const links = [{ href: '', rel: '', target: '', label: 'keep accessible label' }];
+  const context = vm.createContext({
+    URL,
+    document: { readyState: 'loading', addEventListener() {}, querySelectorAll(selector) {
+      assert.equal(selector, 'a[data-owner-play-cta]'); return links;
+    } }
+  });
+  vm.runInContext(siteScript, context);
+  context.initOwnerPlayCtas();
+  assert.equal(links[0].href, 'https://play.google.com/store/apps/details?id=com.aesprt.aquahub');
+  assert.equal(links[0].target, '_blank');
+  assert.equal(links[0].rel, 'noopener noreferrer');
+  assert.equal(links[0].label, 'keep accessible label');
 });
 
 test('Owner Play URL validation accepts only the AquaHub Owner package', () => {
@@ -33,7 +49,7 @@ test('Owner Play URL validation accepts only the AquaHub Owner package', () => {
   });
   vm.runInContext(siteScript, context);
 
-  assert.equal(vm.runInContext('AQUAHUB_CONFIG.ownerPlayUrl', context), '');
+  assert.equal(vm.runInContext('AQUAHUB_CONFIG.ownerPlayUrl', context), 'https://play.google.com/store/apps/details?id=com.aesprt.aquahub');
   const isOwnerPlayUrl = context.isOwnerPlayUrl;
   assert.equal(typeof isOwnerPlayUrl, 'function');
   assert.equal(isOwnerPlayUrl('https://play.google.com/store/apps/details?id=com.aesprt.aquahub'), true);

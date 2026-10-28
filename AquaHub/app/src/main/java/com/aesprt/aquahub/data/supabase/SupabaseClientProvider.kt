@@ -7,7 +7,6 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.functions.Functions
-import io.ktor.client.engine.android.Android
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -28,7 +27,7 @@ object SupabaseClientProvider {
             supabaseUrl = BuildConfig.SUPABASE_URL,
             supabaseKey = BuildConfig.SUPABASE_ANON_KEY
         ) {
-            httpEngine = Android.create()
+            httpEngine = createSupabaseHttpEngine()
             // OTP delivery can be slower on mobile networks. Keep the auth
             // request bounded, but do not fail after the 1–10 second defaults
             // that commonly occur during a cold start or carrier handoff.

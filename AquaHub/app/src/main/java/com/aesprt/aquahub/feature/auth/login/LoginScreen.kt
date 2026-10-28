@@ -22,6 +22,7 @@ import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.credentials.CredentialManager
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
@@ -114,6 +115,8 @@ fun LoginScreen(
                         } else {
                             viewModel.showError("Google returned an unsupported credential.")
                         }
+                    } catch (_: NoCredentialException) {
+                        viewModel.showError("No Google account is available on this device. Try another sign-in method.")
                     } catch (error: GetCredentialException) {
                         viewModel.showError(error.message ?: "Google sign-in was cancelled")
                     }

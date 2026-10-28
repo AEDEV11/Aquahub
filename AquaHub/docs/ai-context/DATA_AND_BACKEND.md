@@ -12,7 +12,7 @@ All primary operational IDs are auto-generated `Long` except sync composite keys
 | Customer | `customers`, `customer_addresses` | Customers indexed by station/phone; addresses cascade on customer deletion. |
 | Catalog/fulfilment | `products`, `riders` | Indexed by station; products separate temporary availability from archived active state; no Station FK. |
 | Orders | `orders`, `order_items`, `payments` | Orders indexed by station/customer/status/createdAt; items and payments cascade on order deletion. Product/customer/rider/address links are mostly logical. |
-| Containers | `containers`, `container_transactions` | Indexed by station and movement customer/order IDs; links are logical. |
+| Containers | `containers`, `container_transactions` | Indexed by station and movement customer/order IDs; links are logical. Supabase `container_movements` is pulled into Room by stable movement identity after local cache clearing. |
 | Expenses | `expenses` | Station/date indexes with an optional category filter; amounts are integer centavos and records are archived rather than physically deleted. |
 | Subscription | `subscription_plans`, `subscriptions`, `plan_features`, `plan_limits`, `subscription_history` | Plan code and feature/limit pairs unique; subscriptions have Station/Plan FKs; history has Station FK. |
 | Sync | `sync_metadata`, `sync_queue`, `sync_cursors` | Unique local↔remote mapping; unique operation ID; queue/cursor lookup indexes. |
@@ -37,7 +37,7 @@ Version 14 embeds optional promotion fields on products. Version 15 adds the sta
 
 ## Local session and tenant data
 
-Preferences DataStore stores onboarding/login/demo state, current owner/station identifiers and active station. Room contains operational/customer data. On logout, the app clears and reseeds the local Room cache when the durable sync queue is empty, and clears the recorded tenant owner; it retains the completed-onboarding flag and does not delete cloud data. If pending, failed, in-progress, or quarantined sync operations remain, logout preserves the cache and owner scope for recovery by the original account. Do not store new credentials or plaintext passwords. `OwnerEntity.password` and `RoomAuthRepository` are legacy; production registration stores an empty local password.
+Preferences DataStore stores onboarding/login/demo state, current owner/station identifiers and active station. Room contains operational/customer data. On logout, the app clears and reseeds the local Room cache when the durable sync queue is empty, and clears the recorded tenant owner; it retains the completed-onboarding flag and does not delete cloud data. Login sync restores the Supabase container movement ledger; billing history is fetched from Supabase when the subscription history screen opens. If pending, failed, in-progress, or quarantined sync operations remain, logout preserves the cache and owner scope for recovery by the original account. Do not store new credentials or plaintext passwords. `OwnerEntity.password` and `RoomAuthRepository` are legacy; production registration stores an empty local password.
 
 ## Firebase boundary
 
@@ -47,7 +47,7 @@ Remote resources are nested below business/station except account-scoped subscri
 
 Product and station images upload to Firebase Storage under `owner-media/{ownerUid}/stations/{localStationId}/`. The client and Storage rules accept only JPEG, PNG, and WebP images up to 5 MB. Writes and deletes are owner-UID scoped; reads require an authenticated app user. The resulting download URL is stored in the existing `Product.imagePath` or `Station.logoPath` field and then follows the normal Room/outbox/Firestore projection flow.
 
-No general HTTP client, base URL, serializer, interceptors, REST timeout, or WebSocket exists. Firebase SDK and WorkManager provide connectivity/retry behavior.
+Owner Supabase requests share `SupabaseClientProvider`, using the Kotlin Supabase modules and Ktor OkHttp engine with a bounded 30-second request timeout. The URL and public key are variant-specific build configuration; service-role credentials are never used by the Android client. The engine must support cancellation without synchronously draining an SSL stream on the UI thread. WorkManager provides operational sync scheduling; Firebase remains a messaging/telemetry dependency.
 
 ## Outbox guarantees and limits
 

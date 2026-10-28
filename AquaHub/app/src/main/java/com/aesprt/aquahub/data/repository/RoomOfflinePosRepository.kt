@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.SystemClock
 import androidx.room.withTransaction
 import com.aesprt.aquahub.core.database.AquaHubDatabase
+import com.aesprt.aquahub.core.config.ReleaseFeatureFlags
 import com.aesprt.aquahub.data.local.dao.OfflinePosDao
 import com.aesprt.aquahub.data.local.dao.SyncDao
 import com.aesprt.aquahub.data.local.entity.OfflinePosGrantEntity
@@ -61,7 +62,8 @@ class RoomOfflinePosRepository(
     private val paymentDao: PaymentDao,
     private val remote: SupabaseOfflinePosDataSource,
     private val scheduler: SyncScheduler,
-    private val cryptography: OfflinePosCryptography = OfflinePosCryptography()
+    private val cryptography: OfflinePosCryptography = OfflinePosCryptography(),
+    private val offlinePosEnabled: Boolean = ReleaseFeatureFlags.offlinePosEnabled,
 ) : OfflinePosRepository {
     private val json = Json { ignoreUnknownKeys = true; isLenient = false }
 
@@ -69,6 +71,7 @@ class RoomOfflinePosRepository(
         stationId: Long,
         items: List<OfflinePosReservationItem>
     ): OfflinePosStatus {
+        check(offlinePosEnabled) { ReleaseFeatureFlags.OFFLINE_POS_DISABLED_MESSAGE }
         require(items.isNotEmpty() && items.all { it.quantity in 1..500 }) { "Select valid products and quantities." }
         require(items.map { it.productLocalId }.distinct().size == items.size) { "Combine duplicate products before reserving stock." }
         val profileUid = requireNotNull(SupabaseClientProvider.client.auth.currentUserOrNull()?.id) {
@@ -237,6 +240,18 @@ class RoomOfflinePosRepository(
         // invalidates permission to start any new offline transaction.
         val pendingCash = offlinePosDao.getPendingCashSalesCentavos(stationId, profileUid, 0L, Long.MAX_VALUE)
         val pendingCount = offlinePosDao.getPendingCount(stationId, profileUid)
+        if (!offlinePosEnabled) {
+            return OfflinePosStatus(
+                pendingCashSalesCentavos = pendingCash,
+                pendingOperationCount = pendingCount,
+                state = "DISABLED",
+                message = if (pendingCount > 0) {
+                    ReleaseFeatureFlags.OFFLINE_POS_RECOVERY_MESSAGE
+                } else {
+                    ReleaseFeatureFlags.OFFLINE_POS_DISABLED_MESSAGE
+                },
+            )
+        }
         val identity = runCatching { OfflinePosCryptography.deviceIdentity(context) }.getOrNull()
             ?: return OfflinePosStatus(
                 pendingCashSalesCentavos = pendingCash,
@@ -326,6 +341,7 @@ class RoomOfflinePosRepository(
     }
 
     override suspend fun recordCashSale(request: OfflineCashSaleRequest): Long {
+        check(offlinePosEnabled) { ReleaseFeatureFlags.OFFLINE_POS_DISABLED_MESSAGE }
         require(request.items.isNotEmpty() && request.items.map { it.productLocalId }.distinct().size == request.items.size) { "Choose valid products for this cash sale." }
         val status = getStatus(request.stationId)
         check(status.canCreateOfflineSale) { status.message ?: "Offline authorization is not valid." }
@@ -569,6 +585,7 @@ class RoomOfflinePosRepository(
     }
 
     override suspend fun retryReconciliation(operationId: String) {
+        check(offlinePosEnabled) { ReleaseFeatureFlags.OFFLINE_POS_RECOVERY_MESSAGE }
         val profileUid = requireNotNull(SupabaseClientProvider.client.auth.currentUserOrNull()?.id) {
             "Sign in to the original account before retrying a saved cash sale."
         }

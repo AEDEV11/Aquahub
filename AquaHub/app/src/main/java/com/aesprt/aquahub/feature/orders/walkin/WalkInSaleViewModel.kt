@@ -16,6 +16,8 @@ import com.aesprt.aquahub.domain.model.unitPriceFor
 import com.aesprt.aquahub.domain.model.OfflinePosStatus
 import com.aesprt.aquahub.domain.model.OfflinePosReservationItem
 import com.aesprt.aquahub.domain.model.OfflinePosRecoveryRecord
+import com.aesprt.aquahub.core.config.ReleaseFeatureFlags
+import com.aesprt.aquahub.core.config.canCreateOfflineCheckout
 import com.aesprt.aquahub.domain.repository.OfflinePosRepository
 import com.aesprt.aquahub.sync.ConnectivityMonitor
 import com.aesprt.aquahub.domain.usecase.auth.ObserveCurrentOwnerUseCase
@@ -58,11 +60,13 @@ data class WalkInSaleUiState(
     val deliveryAccessResolved: Boolean = false,
     val chargeToAccount: Boolean = false,
     val isOnline: Boolean = true,
+    val offlinePosEnabled: Boolean = ReleaseFeatureFlags.offlinePosEnabled,
     val offlinePosStatus: OfflinePosStatus = OfflinePosStatus(),
     val offlineRecoveryRecords: List<OfflinePosRecoveryRecord> = emptyList(),
     val showOfflineRecoveryRecords: Boolean = false,
     val cashReceivedText: String = "",
     val notes: String = "",
+    val isLoading: Boolean = true,
     val isSubmitting: Boolean = false,
     val loadErrorMessage: String? = null,
     /** Reused when the same sale is retried after an uncertain network result. */
@@ -111,7 +115,14 @@ data class WalkInSaleUiState(
     val availablePaymentMethods: List<PaymentMethod>
         get() = buildList {
             if (!isOnline) {
-                if (cashPaymentEnabled && offlinePosStatus.canCreateOfflineSale) add(PaymentMethod.CASH)
+                if (cashPaymentEnabled && canCreateOfflineCheckout(
+                        featureEnabled = offlinePosEnabled,
+                        isOnline = isOnline,
+                        hasValidLease = offlinePosStatus.canCreateOfflineSale,
+                    )
+                ) {
+                    add(PaymentMethod.CASH)
+                }
                 return@buildList
             }
             if (deliveryMode == "DELIVERY") {
@@ -197,6 +208,7 @@ class WalkInSaleViewModel(
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun loadData() {
         dataObservationJob?.cancel()
+        _uiState.update { it.copy(isLoading = true, loadErrorMessage = null) }
         dataObservationJob = viewModelScope.launch {
             combine(
                 activeStationContext.observeActiveStationId(),
@@ -208,6 +220,8 @@ class WalkInSaleViewModel(
                 refreshOfflineStatus()
                 _uiState.update {
                     it.copy(
+                        isLoading = true,
+                        loadErrorMessage = null,
                         deliveryManagementAllowed = false,
                         deliveryAccessResolved = false,
                         deliveryMode = if (it.deliveryMode == "DELIVERY") "PICKUP" else it.deliveryMode
@@ -246,7 +260,10 @@ class WalkInSaleViewModel(
             }.catch { error ->
                 if (error is kotlinx.coroutines.CancellationException) throw error
                 _uiState.update {
-                    it.copy(loadErrorMessage = "Could not load Walk-in Sales data. Check your connection and retry.")
+                    it.copy(
+                        isLoading = false,
+                        loadErrorMessage = "Could not load Walk-in Sales data. Check your connection and retry."
+                    )
                 }
             }.collect { live ->
                 _uiState.update { current ->
@@ -268,6 +285,7 @@ class WalkInSaleViewModel(
                         if (live.mayaPaymentEnabled) add(PaymentMethod.MAYA)
                     }
                     current.copy(
+                        isLoading = false,
                         products = live.products,
                         customers = live.customers,
                         containers = live.containers,
@@ -293,7 +311,7 @@ class WalkInSaleViewModel(
     }
 
     fun retryLoadData() {
-        _uiState.update { it.copy(loadErrorMessage = null) }
+        _uiState.update { it.copy(isLoading = true, loadErrorMessage = null) }
         loadData()
     }
 
@@ -367,6 +385,10 @@ class WalkInSaleViewModel(
 
     fun retryOfflineReconciliation(operationId: String) {
         val state = _uiState.value
+        if (!state.offlinePosEnabled) {
+            _uiState.update { it.copy(errorMessage = ReleaseFeatureFlags.OFFLINE_POS_RECOVERY_MESSAGE) }
+            return
+        }
         if (!state.isOnline) {
             _uiState.update { it.copy(errorMessage = "Reconnect to the internet before retrying server verification.") }
             return
@@ -388,6 +410,10 @@ class WalkInSaleViewModel(
     fun prepareOfflineSales() {
         val stationId = currentStationId.takeIf { it > 0L } ?: return
         val state = _uiState.value
+        if (!state.offlinePosEnabled) {
+            _uiState.update { it.copy(errorMessage = ReleaseFeatureFlags.OFFLINE_POS_DISABLED_MESSAGE) }
+            return
+        }
         if (!state.isOnline) {
             _uiState.update { it.copy(errorMessage = "Reconnect to the internet to reserve inventory for offline sales.") }
             return
@@ -418,6 +444,9 @@ class WalkInSaleViewModel(
 
     fun incrementProduct(productId: Long) {
         _uiState.update { current ->
+            if (!current.isOnline && !current.offlinePosEnabled) {
+                return@update current.copy(errorMessage = "Reconnect to add products and complete this sale online.")
+            }
             val currentQty = current.selectedQuantities[productId] ?: 0
             val product = current.products.firstOrNull { it.id == productId }
             val stock = if (!current.isOnline) {
@@ -565,6 +594,11 @@ class WalkInSaleViewModel(
     fun submitWalkInSale(onSuccess: (Long) -> Unit) {
         val state = _uiState.value
         if (state.isSubmitting || !submissionGuard.compareAndSet(false, true)) return
+        if (!state.isOnline && !state.offlinePosEnabled) {
+            _uiState.update { it.copy(errorMessage = ReleaseFeatureFlags.OFFLINE_POS_DISABLED_MESSAGE) }
+            submissionGuard.set(false)
+            return
+        }
         if (state.deliveryMode == "DELIVERY" && !canSelectWalkInDelivery(
                 state.deliveryAccessResolved,
                 state.deliveryManagementAllowed

@@ -143,6 +143,11 @@ Deno.serve(async (request) => {
   }
 
   if (body.action === "authorize") {
+    // A release operator can stop new offline grants without blocking commits
+    // for sales that were already made under a valid grant and stock lease.
+    if (Deno.env.get("OFFLINE_POS_ENABLED")?.trim().toLowerCase() === "false") {
+      return json(503, { error: "OFFLINE_POS_AUTHORIZATION_PAUSED" });
+    }
     const organizationId = body.organization_id;
     const stationId = body.station_id;
     const deviceId = body.device_id;

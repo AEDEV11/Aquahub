@@ -30,6 +30,8 @@ import com.aesprt.aquahub.domain.model.PaymentMethod
 import com.aesprt.aquahub.domain.model.Product
 import com.aesprt.aquahub.domain.model.ProductType
 import com.aesprt.aquahub.domain.model.OfflinePosRecoveryRecord
+import com.aesprt.aquahub.core.config.ReleaseFeatureFlags
+import com.aesprt.aquahub.core.config.canSubmitWalkInSale
 import com.aesprt.aquahub.domain.model.unitPriceFor
 import com.aesprt.aquahub.ui.theme.*
 import java.text.NumberFormat
@@ -249,7 +251,21 @@ fun QuickWalkInSaleContent(
 
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant, thickness = 0.5.dp)
 
-            Row(
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                        Spacer(Modifier.height(AquaHubSpacing.medium))
+                        Text("Loading walk-in sale data…", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            } else Row(
                 modifier = Modifier.weight(1f).fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(AquaHubSpacing.medium)
             ) {
@@ -260,61 +276,106 @@ fun QuickWalkInSaleContent(
                     .weight(if (isTabletWorkspace) 0.62f else 1f)
                     .fillMaxHeight()
             ) {
-                item {
-                    Surface(
-                        color = if (uiState.offlinePosStatus.canCreateOfflineSale && uiState.isOnline)
-                            MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                        shape = AquaHubShapes.cardSecondary,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(AquaHubSpacing.medium),
-                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                if (uiState.offlinePosEnabled) {
+                    item {
+                        Surface(
+                            color = if (uiState.offlinePosStatus.canCreateOfflineSale && uiState.isOnline)
+                                MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                            shape = AquaHubShapes.cardSecondary,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Icon(
-                                    if (uiState.isOnline) Icons.Rounded.CloudDone else Icons.Rounded.CloudOff,
-                                    contentDescription = null,
-                                    tint = if (uiState.isOnline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
-                                )
+                            Column(
+                                modifier = Modifier.padding(AquaHubSpacing.medium),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    Icon(
+                                        if (uiState.isOnline) Icons.Rounded.CloudDone else Icons.Rounded.CloudOff,
+                                        contentDescription = null,
+                                        tint = if (uiState.isOnline) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                                    )
+                                    Text(
+                                        text = if (uiState.isOnline) "Offline cash sales" else "Offline mode · cash pickup only",
+                                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                }
                                 Text(
-                                    text = if (uiState.isOnline) "Offline cash sales" else "Offline mode · cash pickup only",
-                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold)
+                                    text = when {
+                                        uiState.offlinePosStatus.canCreateOfflineSale && uiState.isOnline ->
+                                            "Inventory is reserved until ${uiState.offlinePosStatus.leaseExpiresAtMs?.let { java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT, locale).format(java.util.Date(it)) } ?: "expiry"}. Pending local cash is kept separate from confirmed revenue."
+                                        uiState.isOnline -> uiState.offlinePosStatus.message ?: "Prepare a server inventory lease now to allow cash walk-in sales during a connection loss."
+                                        else -> uiState.offlinePosStatus.message ?: "Offline sales require a valid server-issued authorization and inventory lease."
+                                    },
+                                    style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 )
-                            }
-                            Text(
-                                text = when {
-                                    uiState.offlinePosStatus.canCreateOfflineSale && uiState.isOnline ->
-                                        "Inventory is reserved until ${uiState.offlinePosStatus.leaseExpiresAtMs?.let { java.text.DateFormat.getTimeInstance(java.text.DateFormat.SHORT, locale).format(java.util.Date(it)) } ?: "expiry"}. Pending local cash is kept separate from confirmed revenue."
-                                    uiState.isOnline -> uiState.offlinePosStatus.message ?: "Prepare a server inventory lease now to allow cash walk-in sales during a connection loss."
-                                    else -> uiState.offlinePosStatus.message ?: "Offline sales require a valid server-issued authorization and inventory lease."
-                                },
-                                style = MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            )
-                            if (uiState.isOnline) {
-                                TextButton(
-                                    onClick = onPrepareOfflineSales,
-                                    enabled = !uiState.isSubmitting && uiState.totalItemsCount > 0
-                                ) {
-                                    Text(if (uiState.offlinePosStatus.canCreateOfflineSale) "Use current reserved stock" else "Reserve selected stock")
+                                if (uiState.isOnline) {
+                                    TextButton(
+                                        onClick = onPrepareOfflineSales,
+                                        enabled = !uiState.isSubmitting && uiState.totalItemsCount > 0
+                                    ) {
+                                        Text(if (uiState.offlinePosStatus.canCreateOfflineSale) "Use current reserved stock" else "Reserve selected stock")
+                                    }
+                                }
+                                if (uiState.offlinePosStatus.pendingCashSalesCentavos > 0) {
+                                    Text(
+                                        "Pending cash collected: ${currencyFormat.format(uiState.offlinePosStatus.pendingCashSalesCentavos / 100.0)} · not confirmed revenue",
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                }
+                                if (uiState.offlinePosStatus.pendingOperationCount > 0) {
+                                    TextButton(
+                                        onClick = onToggleOfflineRecoveryRecords,
+                                        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)
+                                    ) {
+                                        Text(
+                                            if (uiState.showOfflineRecoveryRecords) "Hide saved cash sales"
+                                            else "Review ${uiState.offlinePosStatus.pendingOperationCount} saved cash sale(s)"
+                                        )
+                                    }
                                 }
                             }
-                            if (uiState.offlinePosStatus.pendingCashSalesCentavos > 0) {
+                        }
+                    }
+                } else if (!uiState.isOnline || uiState.offlinePosStatus.pendingOperationCount > 0) {
+                    item {
+                        Surface(
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            shape = AquaHubShapes.cardSecondary,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(AquaHubSpacing.medium),
+                                verticalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
                                 Text(
-                                    "Pending cash collected: ${currencyFormat.format(uiState.offlinePosStatus.pendingCashSalesCentavos / 100.0)} · not confirmed revenue",
-                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
-                                    color = MaterialTheme.colorScheme.error
+                                    text = if (uiState.isOnline) "Saved offline receipts need review" else "Internet connection required",
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = MaterialTheme.colorScheme.onErrorContainer
                                 )
-                            }
-                            if (uiState.offlinePosStatus.pendingOperationCount > 0) {
-                                TextButton(
-                                    onClick = onToggleOfflineRecoveryRecords,
-                                    contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)
-                                ) {
+                                Text(
+                                    text = if (uiState.isOnline) ReleaseFeatureFlags.OFFLINE_POS_RECOVERY_MESSAGE
+                                    else "Reconnect to complete this sale online. No offline sale will be recorded.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                                if (uiState.offlinePosStatus.pendingCashSalesCentavos > 0) {
                                     Text(
-                                        if (uiState.showOfflineRecoveryRecords) "Hide saved cash sales"
-                                        else "Review ${uiState.offlinePosStatus.pendingOperationCount} saved cash sale(s)"
+                                        "Saved cash awaiting review: ${currencyFormat.format(uiState.offlinePosStatus.pendingCashSalesCentavos / 100.0)} · not confirmed revenue",
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
+                                        color = MaterialTheme.colorScheme.onErrorContainer
                                     )
+                                }
+                                if (uiState.offlinePosStatus.pendingOperationCount > 0) {
+                                    TextButton(
+                                        onClick = onToggleOfflineRecoveryRecords,
+                                        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 0.dp)
+                                    ) {
+                                        Text(
+                                            if (uiState.showOfflineRecoveryRecords) "Hide saved receipts"
+                                            else "Review ${uiState.offlinePosStatus.pendingOperationCount} saved receipt(s)"
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -325,6 +386,7 @@ fun QuickWalkInSaleContent(
                         OfflineCashRecoveryCard(
                             records = uiState.offlineRecoveryRecords,
                             isOnline = uiState.isOnline,
+                            offlinePosEnabled = uiState.offlinePosEnabled,
                             onRetry = onRetryOfflineReconciliation,
                             currencyFormat = currencyFormat
                         )
@@ -895,7 +957,7 @@ fun QuickWalkInSaleContent(
             }
 
             // Bottom Sticky Pricing and Checkout Area
-            if (!isTabletWorkspace) Surface(
+            if (!isTabletWorkspace && !uiState.isLoading) Surface(
                 color = MaterialTheme.colorScheme.surface,
                 shadowElevation = 16.dp,
                 tonalElevation = 4.dp,
@@ -999,6 +1061,8 @@ fun QuickWalkInSaleContent(
                         text = if (uiState.totalItemsCount > 0) {
                             if (uiState.chargeToAccount) {
                                 "Save Account Charge • ${currencyFormat.format(uiState.totalAmount)}"
+                            } else if (!uiState.isOnline && !uiState.offlinePosEnabled) {
+                                "Reconnect to Complete Sale"
                             } else if (!uiState.isOnline) {
                                 "Record Offline Cash • ${currencyFormat.format(uiState.totalAmount)}"
                             } else {
@@ -1008,7 +1072,11 @@ fun QuickWalkInSaleContent(
                             "Select items to complete sale"
                         },
                         icon = Icons.Rounded.CheckCircle,
-                        enabled = uiState.totalItemsCount > 0 && !uiState.isSubmitting && (uiState.isOnline || uiState.offlinePosStatus.canCreateOfflineSale),
+                        enabled = !uiState.isLoading && uiState.totalItemsCount > 0 && !uiState.isSubmitting && canSubmitWalkInSale(
+                            isOnline = uiState.isOnline,
+                            offlinePosEnabled = uiState.offlinePosEnabled,
+                            hasValidOfflineLease = uiState.offlinePosStatus.canCreateOfflineSale,
+                        ),
                         isLoading = uiState.isSubmitting,
                         onClick = onSubmitSale,
                         modifier = Modifier.fillMaxWidth()
@@ -1023,6 +1091,7 @@ fun QuickWalkInSaleContent(
 private fun OfflineCashRecoveryCard(
     records: List<OfflinePosRecoveryRecord>,
     isOnline: Boolean,
+    offlinePosEnabled: Boolean,
     onRetry: (String) -> Unit,
     currencyFormat: NumberFormat,
 ) {
@@ -1038,7 +1107,11 @@ private fun OfflineCashRecoveryCard(
         ) {
             Text("Saved offline cash sales", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             Text(
-                "These local receipts and item snapshots stay unchanged until the server confirms them.",
+                if (offlinePosEnabled) {
+                    "These local receipts and item snapshots stay unchanged until the server confirms them."
+                } else {
+                    ReleaseFeatureFlags.OFFLINE_POS_RECOVERY_MESSAGE
+                },
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -1098,7 +1171,7 @@ private fun OfflineCashRecoveryCard(
                             color = MaterialTheme.colorScheme.error,
                         )
                     }
-                    if (record.state == "RECONCILIATION_REQUIRED" && record.lastErrorCode == "RETRY_LIMIT_REACHED") {
+                    if (offlinePosEnabled && record.state == "RECONCILIATION_REQUIRED" && record.lastErrorCode == "RETRY_LIMIT_REACHED") {
                         TextButton(
                             onClick = { onRetry(record.operationId) },
                             enabled = isOnline,
@@ -1220,9 +1293,16 @@ private fun WalkInCartPanel(
             }
             Spacer(Modifier.height(AquaHubSpacing.medium))
             AquaHubButton(
-                text = if (uiState.chargeToAccount) "Save account charge" else if (!uiState.isOnline) "Record offline cash" else "Complete sale",
+                text = if (uiState.chargeToAccount) "Save account charge"
+                else if (!uiState.isOnline && !uiState.offlinePosEnabled) "Reconnect to complete sale"
+                else if (!uiState.isOnline) "Record offline cash"
+                else "Complete sale",
                 icon = Icons.Rounded.CheckCircle,
-                enabled = uiState.totalItemsCount > 0 && !uiState.isSubmitting && (uiState.isOnline || uiState.offlinePosStatus.canCreateOfflineSale),
+                enabled = uiState.totalItemsCount > 0 && !uiState.isSubmitting && canSubmitWalkInSale(
+                    isOnline = uiState.isOnline,
+                    offlinePosEnabled = uiState.offlinePosEnabled,
+                    hasValidOfflineLease = uiState.offlinePosStatus.canCreateOfflineSale,
+                ),
                 isLoading = uiState.isSubmitting,
                 onClick = onSubmitSale,
                 modifier = Modifier.fillMaxWidth()

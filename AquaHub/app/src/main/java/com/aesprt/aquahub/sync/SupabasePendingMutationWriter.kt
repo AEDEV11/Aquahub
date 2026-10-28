@@ -62,6 +62,11 @@ class SupabasePendingMutationWriter(
     private val supabaseExpense: SupabaseExpenseDataSource,
     private val supabaseOrder: SupabaseOrderDataSource
 ) {
+    private val containerMovementPullApplier = ContainerMovementPullApplier(
+        database = database,
+        transactionDao = containerTransactionDao,
+        syncDao = syncDao
+    )
     /** Returns true when the migrated Supabase path handled the mutation. */
     suspend fun push(item: com.aesprt.aquahub.data.local.entity.SyncQueueEntity): Boolean {
         if (item.resourceType in setOf(
@@ -162,6 +167,21 @@ class SupabasePendingMutationWriter(
                 }
             }
         }
+    }
+
+    /** Restores the detailed customer loan ledger after the local tenant cache is cleared. */
+    suspend fun refreshContainerMovements(): Int {
+        if (SupabaseClientProvider.client.auth.currentUserOrNull() == null) return 0
+        var imported = 0
+        for (station in stationDao.getAllStations()) {
+            val stationRemoteId = syncDao.getMetadata(SyncResourceType.STATION.name, station.id)?.remoteId
+                ?: continue
+            imported += containerMovementPullApplier.apply(
+                stationId = station.id,
+                rows = supabaseContainer.movements(stationRemoteId)
+            )
+        }
+        return imported
     }
 
     private suspend fun pushDelivery(item: com.aesprt.aquahub.data.local.entity.SyncQueueEntity): Boolean {
@@ -337,7 +357,8 @@ class SupabasePendingMutationWriter(
     private fun com.aesprt.aquahub.data.local.entity.PaymentEntity.deliveryPaymentProofObjectPath(): String? =
         metadataJson?.let { raw ->
             runCatching {
-                Json.parseToJsonElement(raw).jsonObject["delivery_payment_proof_object_path"]
+                val metadata = Json.parseToJsonElement(raw).jsonObject
+                (metadata["payment_proof_object_path"] ?: metadata["delivery_payment_proof_object_path"])
                     ?.jsonPrimitive?.contentOrNull
             }.getOrNull()
         }?.takeIf(String::isNotBlank)

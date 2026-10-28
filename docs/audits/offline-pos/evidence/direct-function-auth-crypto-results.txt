@@ -1,0 +1,9 @@
+local_email_signup_http=200
+local_email_confirmed=True
+invalid_fingerprint_http=503
+invalid_fingerprint_error=OFFLINE_SIGNING_CONFIGURATION_INVALID
+qa_fingerprint_http=403
+qa_fingerprint_error=DEVICE_REGISTRATION_REJECTED
+qa_pair_check_passed_before_expected_station_rejection=True
+test_auth_cleanup_http=200
+test_auth_cleanup_ok=True

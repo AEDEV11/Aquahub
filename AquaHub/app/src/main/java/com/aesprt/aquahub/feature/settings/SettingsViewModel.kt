@@ -10,6 +10,7 @@ import com.aesprt.aquahub.domain.usecase.auth.ObserveCurrentOwnerUseCase
 import com.aesprt.aquahub.domain.usecase.auth.ReauthenticateUseCase
 import com.aesprt.aquahub.domain.usecase.auth.ReauthenticateWithGoogleUseCase
 import com.aesprt.aquahub.domain.usecase.station.ObserveStationUseCase
+import com.aesprt.aquahub.data.repository.AccountDeletionReauthenticationRequiredException
 import com.aesprt.aquahub.data.supabase.auth.SupabaseAuthDataSource
 import com.aesprt.aquahub.data.supabase.auth.ReauthenticationIdentityMismatchException
 import com.aesprt.aquahub.data.supabase.marketing.SupabaseMarketingPreferencesDataSource
@@ -47,6 +48,11 @@ data class SettingsUiState(
 
 internal fun shouldShowEmailVerification(providerType: String?, emailAddress: String?): Boolean =
     providerType.equals("email", ignoreCase = true) && !emailAddress.isNullOrBlank()
+
+internal fun requiresDeletionReauthentication(error: Throwable): Boolean =
+    error is AccountDeletionReauthenticationRequiredException ||
+        error.message?.contains("recent", ignoreCase = true) == true ||
+        error.message?.contains("requires-recent-login", ignoreCase = true) == true
 
 sealed interface SettingsEvent {
     data object LogoutSuccess : SettingsEvent
@@ -260,9 +266,7 @@ class SettingsViewModel(
         _uiState.update { it.copy(deletionError = null) }
     }
 
-    private fun isRecentLoginRequired(error: Throwable): Boolean =
-        error.message?.contains("recent", ignoreCase = true) == true ||
-            error.message?.contains("requires-recent-login", ignoreCase = true) == true
+    private fun isRecentLoginRequired(error: Throwable): Boolean = requiresDeletionReauthentication(error)
 
     private fun mapDeletionError(error: Throwable): String = when {
         error.message?.contains("recent", ignoreCase = true) == true -> "For your security, please sign in again before deleting your account."

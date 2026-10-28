@@ -585,8 +585,91 @@ class RoomSubscriptionRepository(
         // Remove rows written by older builds, which incorrectly labeled Free
         // plan activation as a trial. This is scoped to Free plan rows only.
         historyDao.deleteFreePlanTrialHistory(stationId)
+        val cached = historyDao.getHistoryForStation(stationId)
+        try {
+            refreshSubscriptionHistoryFromSupabase(stationId)
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            // Keep usable history available offline, but don't turn an empty
+            // cache plus a failed remote read into a misleading empty result.
+            if (cached.isEmpty()) throw error
+        }
+        historyDao.deleteFreePlanTrialHistory(stationId)
         return historyDao.getHistoryForStation(stationId).map { it.toDomain() }
     }
+
+    private suspend fun refreshSubscriptionHistoryFromSupabase(stationId: Long) =
+        subscriptionMutationMutex.withLock {
+            val effective = subscriptionDataSource.effectiveEntitlements()
+            val organizationId = effective.organizationId ?: return@withLock
+            val remoteStationIds = subscriptionDataSource.stationIdsForOrganization(organizationId)
+            val localStationIds = localStationIdsForRemoteIds(stationDao, syncDao, remoteStationIds)
+            if (stationId !in localStationIds) return@withLock
+
+            val remoteHistory = subscriptionDataSource.history(organizationId)
+            val remotePlanCodes = subscriptionDataSource.planCodes()
+            val localPlanIds = remotePlanCodes.mapNotNull { (remoteId, code) ->
+                planDao.getPlanByCode(code)?.id?.let { remoteId to it }
+            }.toMap()
+            database.withTransaction {
+                localStationIds.forEach { localStationId ->
+                    val localHistory = historyDao.getHistoryForStation(localStationId)
+                    val localSubscriptionId = subscriptionDao.getCurrentSubscription(localStationId)?.id ?: 0L
+                    remoteHistory.forEach historyLoop@ { remote ->
+                        val eventType = runCatching {
+                            SubscriptionEventType.valueOf(remote.eventType.uppercase())
+                        }.getOrNull() ?: return@historyLoop
+                        val previousPlanId = remote.previousPlanId?.let(localPlanIds::get)
+                        val newPlanId = remote.newPlanId?.let(localPlanIds::get)
+                        if (eventType == SubscriptionEventType.TRIAL_STARTED &&
+                            newPlanId?.let { planDao.getPlanById(it)?.code } == SubscriptionPlanCode.FREE.name
+                        ) return@historyLoop
+
+                        val metadataKey = "${remote.id}:$localStationId"
+                        if (syncDao.getMetadataByRemoteId(SyncResourceType.SUBSCRIPTION_HISTORY.name, metadataKey) != null) {
+                            return@historyLoop
+                        }
+                        val matchingLocal = localHistory.firstOrNull { existing ->
+                            existing.eventType == eventType.name &&
+                                existing.effectiveAt == remote.effectiveAt &&
+                                existing.previousPlanId == previousPlanId &&
+                                existing.newPlanId == newPlanId &&
+                                existing.previousStatus == remote.previousStatus &&
+                                existing.newStatus == remote.newStatus &&
+                                syncDao.getMetadata(SyncResourceType.SUBSCRIPTION_HISTORY.name, existing.id) == null
+                        }
+                        val createdAt = runCatching { java.time.Instant.parse(remote.createdAt).toEpochMilli() }
+                            .getOrDefault(remote.effectiveAt)
+                        val localId = matchingLocal?.id ?: historyDao.insertHistoryEntry(
+                            SubscriptionHistoryEntity(
+                                stationId = localStationId,
+                                subscriptionId = localSubscriptionId,
+                                previousPlanId = previousPlanId,
+                                newPlanId = newPlanId,
+                                eventType = eventType.name,
+                                effectiveAt = remote.effectiveAt,
+                                previousStatus = remote.previousStatus,
+                                newStatus = remote.newStatus,
+                                notes = remote.notes,
+                                createdAt = createdAt
+                            )
+                        )
+                        syncDao.upsertMetadata(
+                            com.aesprt.aquahub.data.local.entity.SyncMetadataEntity(
+                                resourceType = SyncResourceType.SUBSCRIPTION_HISTORY.name,
+                                localId = localId,
+                                remoteId = metadataKey,
+                                stationLocalId = localStationId,
+                                lastLocalUpdatedAt = remote.effectiveAt,
+                                lastServerUpdatedAt = createdAt,
+                                lastSyncedAt = System.currentTimeMillis()
+                            )
+                        )
+                    }
+                }
+            }
+        }
 
     override suspend fun processSubscriptionExpiration(stationId: Long): Subscription? = subscriptionMutationMutex.withLock {
         val existing = subscriptionDao.getCurrentSubscription(stationId) ?: return@withLock null

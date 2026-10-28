@@ -86,12 +86,14 @@ fun StaffManagementScreen(
             verticalArrangement = Arrangement.spacedBy(AquaHubSpacing.small)
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
-                Text("Team accounts", style = MaterialTheme.typography.headlineSmall)
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "Staff can use Home, Orders, and Walk-in Sales. Riders can update delivery status only.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Column(Modifier.fillMaxWidth()) {
+                    Text("Team accounts", style = MaterialTheme.typography.headlineSmall)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        "Staff can use Home, Orders, and Walk-in Sales. Riders can update delivery status only.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
             item(span = { GridItemSpan(maxLineSpan) }) {
                 StaffLimitCard(

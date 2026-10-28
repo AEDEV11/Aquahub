@@ -1,0 +1,128 @@
+
+> aquahub-web-ordering@1.0.0 test
+> node --test
+
+TAP version 13
+# Subtest: offers the same refill container choices as the customer app
+ok 1 - offers the same refill container choices as the customer app
+  ---
+  duration_ms: 192.829217
+  type: 'test'
+  ...
+# Subtest: keeps earlier tracking capabilities when a newer order is created
+ok 2 - keeps earlier tracking capabilities when a newer order is created
+  ---
+  duration_ms: 14.568387
+  type: 'test'
+  ...
+# Subtest: limits session order history and drops the oldest entry
+ok 3 - limits session order history and drops the oldest entry
+  ---
+  duration_ms: 22.19846
+  type: 'test'
+  ...
+# Subtest: maps pickup and delivery status to the right progress milestone
+ok 4 - maps pickup and delivery status to the right progress milestone
+  ---
+  duration_ms: 15.550724
+  type: 'test'
+  ...
+# Subtest: station ordering requires a matching, affirmative public eligibility row
+ok 5 - station ordering requires a matching, affirmative public eligibility row
+  ---
+  duration_ms: 107.272207
+  type: 'test'
+  ...
+# Subtest: normalizes Philippine mobile numbers into the canonical E.164 format
+ok 6 - normalizes Philippine mobile numbers into the canonical E.164 format
+  ---
+  duration_ms: 23.892651
+  type: 'test'
+  ...
+# Subtest: rejects malformed and non-Philippine mobile numbers
+ok 7 - rejects malformed and non-Philippine mobile numbers
+  ---
+  duration_ms: 13.618772
+  type: 'test'
+  ...
+# Subtest: applies fixed and percentage promotions using integer centavos
+ok 8 - applies fixed and percentage promotions using integer centavos
+  ---
+  duration_ms: 16.795848
+  type: 'test'
+  ...
+# Subtest: quantity promotions respect minimum quantity and active time window
+ok 9 - quantity promotions respect minimum quantity and active time window
+  ---
+  duration_ms: 16.806077
+  type: 'test'
+  ...
+# Subtest: quantity-break percentage discounts apply only at the configured quantity
+ok 10 - quantity-break percentage discounts apply only at the configured quantity
+  ---
+  duration_ms: 8.194038
+  type: 'test'
+  ...
+# Subtest: pickup offers enabled cash, account balance and provider methods
+ok 11 - pickup offers enabled cash, account balance and provider methods
+  ---
+  duration_ms: 87.796183
+  type: 'test'
+  ...
+# Subtest: delivery offers COD and enabled providers, never cash or account balance
+ok 12 - delivery offers COD and enabled providers, never cash or account balance
+  ---
+  duration_ms: 6.497842
+  type: 'test'
+  ...
+# Subtest: payment choices contain only enabled methods and never invent cash
+ok 13 - payment choices contain only enabled methods and never invent cash
+  ---
+  duration_ms: 32.314782
+  type: 'test'
+  ...
+# Subtest: cart totals use discounted per-unit prices and integer centavos
+ok 14 - cart totals use discounted per-unit prices and integer centavos
+  ---
+  duration_ms: 14.548851
+  type: 'test'
+  ...
+# Subtest: cart breakdown shows regular subtotal, promotion savings and discounted subtotal
+ok 15 - cart breakdown shows regular subtotal, promotion savings and discounted subtotal
+  ---
+  duration_ms: 6.081375
+  type: 'test'
+  ...
+# Subtest: delivery location validation requires a verified pin only when radius rules need it
+ok 16 - delivery location validation requires a verified pin only when radius rules need it
+  ---
+  duration_ms: 6.084702
+  type: 'test'
+  ...
+# Subtest: resolves an owner-saved Supabase bucket URI as a public object path
+ok 17 - resolves an owner-saved Supabase bucket URI as a public object path
+  ---
+  duration_ms: 119.090907
+  type: 'test'
+  ...
+# Subtest: preserves direct URLs and raw Storage object paths
+ok 18 - preserves direct URLs and raw Storage object paths
+  ---
+  duration_ms: 7.095392
+  type: 'test'
+  ...
+# Subtest: rejects malformed or cross-bucket Supabase references
+ok 19 - rejects malformed or cross-bucket Supabase references
+  ---
+  duration_ms: 20.083682
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8498.760534

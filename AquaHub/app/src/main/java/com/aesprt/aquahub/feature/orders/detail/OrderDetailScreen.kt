@@ -1941,8 +1941,16 @@ private fun PaymentRefundSection(
                     Column(modifier = Modifier.weight(1f)) {
                         Text(payment.paymentMethod.displayName(), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
                         Text("Collected ${currency.format(payment.amount)} · refundable ${formatCentavos(remaining, currency)}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        payment.referenceNumber?.takeIf(String::isNotBlank)?.let { reference ->
+                            Text("Reference: $reference", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
                         payment.deliveryPaymentProofObjectPath?.let { objectPath ->
                             val reference = "supabase://payment-assets/$objectPath"
+                            val proofLabel = if (objectPath.contains("/customer-payment-proofs/")) {
+                                "Customer-submitted proof"
+                            } else {
+                                "Rider payment proof"
+                            }
                             Surface(
                                 onClick = { proofToShow = reference },
                                 shape = RoundedCornerShape(12.dp),
@@ -1956,13 +1964,13 @@ private fun PaymentRefundSection(
                                 ) {
                                     StorageAssetImage(
                                         reference = reference,
-                                        contentDescription = "Rider payment proof thumbnail",
+                                        contentDescription = "$proofLabel thumbnail",
                                         contentScale = ContentScale.Crop,
                                         privateByDefault = true,
                                         modifier = Modifier.size(64.dp).clip(RoundedCornerShape(8.dp))
                                     )
                                     Column {
-                                        Text("Rider payment proof", style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
+                                        Text(proofLabel, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.SemiBold)
                                         Text("Tap to view", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     }
                                     Icon(Icons.Rounded.OpenInFull, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -2020,10 +2028,10 @@ private fun PaymentRefundSection(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text("Rider payment proof", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                    Text("Payment proof", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                     StorageAssetImage(
                         reference = reference,
-                        contentDescription = "Rider payment proof",
+                        contentDescription = "Payment proof",
                         contentScale = ContentScale.Fit,
                         privateByDefault = true,
                         modifier = Modifier.fillMaxWidth().height(360.dp).clip(RoundedCornerShape(16.dp))

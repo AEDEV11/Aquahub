@@ -1,0 +1,23 @@
+{
+  "account-deletion.html": "b848c4f9191d4963a2c5ee626e18259ebc0417a733df3e1fe1a87bba11f5b941",
+  "index.html": "2fe469166e7785b7dbd05ca2ec059fddd874c03a4481d4c4fa164bc74c985054",
+  "privacy.html": "601efdce507156fd937c1e3724db4c2957d977f929a67abe2b2c8952ba52314c",
+  "subscription-policy.html": "d492992681232bc5f6ca1bdb4ef01555b5ad785840e9b239ce2776305050a54a",
+  "support.html": "a2b95d506f213ed14dd803b555feacb1d303b8aad616d186fb6ab96ad03a37a2",
+  "terms.html": "900649b8b45edcb695a3cbac3985e2a5517a98e09f0b920a1cffc24a2abc2f8b",
+  "404.html": "1c1334f73f23e975a22456033b0f302704d5f5f2506f3c23f3e5b53cf2c9ad91",
+  "main.js": "29bb1ea8ac27fe6af097ffd18bf312da7ac00db4d5c8991384c636dc469b7941",
+  "motion.js": "f99f46dbe22d3f7631db89b39981f79f1d03e38eebf194eadfd0d026c74969b3",
+  "newsletter-config.js": "4705429b9f1adbee4686fb30c0694382c49ebfdf07d156e897bf342d79dc6719",
+  "newsletter-utils.js": "994faad4a65f068775762bd65e44a9cd0db16774408a5e5c42f952bcd22fcac8",
+  "newsletter.js": "214768640a1005196120bbe0d43bfb729b1a6754818f4f31bfc484c91bba9284",
+  "pricing-utils.js": "bc4c1f0f1b4ba18893a607e85daa831d973b1b36d32242e2699442e99c8c1cd9",
+  "landing.css": "0cef258b11dd761e3a2d9f33548bfbe7aafdbee2eb2b33062df24dd9838a30bf",
+  "styles.css": "161769880ba1739495a58ef5bdf35fcc0b18f60cb172ce827f5e9ef4a2da40ad",
+  "firebase.json": "141ed3049cc55447c8d2b4c410dea82fd186c7ceaba01032b4fdbc53f1cf1c2c",
+  "sitemap.xml": "2a2ee2cd5d2f86c158433ae44a61f64b2e36d529f99e081169d516d0cd513a57",
+  "robots.txt": "85aacbb78478a0d41913367a2591dac2f7842e49881b4d4da4eea17cedde5a25",
+  "assets/fonts/plus-jakarta-sans-latin.woff2": "153fc85b70298beeb1d61a5f723331649e7f23bb77302a66e61cb3e2fbdb5e79",
+  "assets/fonts/plus-jakarta-sans-latin-ext.woff2": "38e3b8fd8045048eb311d90170a4429ed2c8f405852dc3d91b5af8452758703f",
+  "assets/fonts/OFL-Plus-Jakarta-Sans.txt": "995c7199cab65954f545996326755daee7b63cc6b42b06c13da1f9502ab08a99"
+}

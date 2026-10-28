@@ -4,12 +4,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <base href="/" />
   <meta name="theme-color" content="#0284c7" />
   <meta name="description" content="AquaHub Privacy Policy." />
+  <link rel="canonical" href="https://aquahub.aesprt.com/privacy" />
   <title>Privacy Policy — AquaHub</title>
   <link rel="icon" href="assets/favicon-64.png?v=20260927-white-icon" type="image/png" />
-  <link rel="stylesheet" href="styles.css?v=20260917-responsive" />
+  <link rel="stylesheet" href="styles.css?v=20261025-analytics" />
 </head>
 
 <body>
@@ -26,12 +26,12 @@
   <main id="main">
     <section class="legal-hero">
       <div class="container">
-        <a class="back-link" href="index.html">← Back to AquaHub</a>
+        <a class="back-link" href="index.html"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 12H5m7-7-7 7 7 7" /></svg> Back to AquaHub</a>
         <h1>Privacy Policy</h1>
         <p>This policy explains how AquaHub Owner, AquaHub Customer, and related services collect, use, protect, retain,
           and disclose personal information.</p>
         <div class="legal-meta"><span>Effective date: <time datetime="2026-09-14">September 14, 2026</time></span><span>Last
-            updated: <time datetime="2026-10-10">October 10, 2026</time></span></div>
+            updated: <time datetime="2026-10-18">October 18, 2026</time></span></div>
       </div>
     </section>
 
@@ -70,6 +70,12 @@
               status, history, delivery instructions, ratings, and feedback where available.</li>
             <li>Notification information needed to send order and service updates.</li>
           </ul>
+          <h3>Browser ordering information</h3>
+          <p>Customers can order through a participating station's website without creating an AquaHub account.
+            We process the name, mobile number, order details, pickup or delivery choice, delivery address and map
+            location where provided, and any payment reference or receipt image submitted for the order. Relevant
+            details and payment proof are shared with the station handling the order. A submitted receipt image is
+            not independent confirmation from a bank or payment provider.</p>
           <h3>AquaHub Owner information</h3>
           <ul>
             <li>Station name, business contact information, station address and location, business hours, product
@@ -85,6 +91,20 @@
           <p>Depending on enabled services, AquaHub may receive device type, Android version, app version, application
             identifiers, crash information, diagnostic information, network status, performance information, and
             security-related information.</p>
+          <h3>Website and browser storage</h3>
+          <p>Website requests may include IP address, browser and device information, requested pages, and performance
+            or security diagnostics. Browser ordering stores cart choices on your device. If you choose to remember
+            your details, it stores your contact and delivery information in that browser. Order tracking and retry
+            information are stored for the browser session. Do not share private tracking links or use remembered
+            details on a shared device. Clearing browser site data removes local copies but does not delete server
+            order records; contact privacy support to request deletion of those records.</p>
+          <p>The marketing website also records one aggregate visit per browser session in AeDev's Firebase Realtime
+            Database. A session-storage flag prevents repeat counts within that browser session. The counter stores
+            only the total number of visits, not names, contact details, or browser identifiers. Firebase may process
+            standard connection information when serving the request.</p>
+          <p>If you allow optional website analytics, Firebase Analytics records page views and usage events for the
+            AquaHub website. Your choice is saved in browser storage, and analytics does not start if you decline.
+            Google processes this analytics data under its service terms.</p>
           <h3>Marketing subscriptions</h3>
           <p>If you independently subscribe to AquaHub marketing updates or opt in from AquaHub Owner, we process your
             email address, optional first name, consent choice and time, consent-policy version, subscription source,
@@ -97,7 +117,7 @@
           <p>We may process information to create and authenticate accounts, provide AquaHub services, manage orders,
             connect customers with stations, support pickup and delivery, calculate distance, manage products and
             inventory, manage riders or delivery operations, generate reports and analytics, synchronize supported data
-            across devices, maintain offline-first functionality, validate subscriptions, send service notifications,
+            across devices, maintain supported on-device caches, validate subscriptions, send service notifications,
             provide support, improve stability, prevent abuse, and comply with applicable law.</p>
           <p>When you have opted in, we use your email address to send AquaHub product updates, helpful tips, and
             promotional offers. You can withdraw this marketing consent at any time through the unsubscribe link in a
@@ -122,17 +142,21 @@
         </section>
 
         <section>
-          <h2>6. Offline storage and synchronization</h2>
-          <p>Some AquaHub functionality may operate offline. Information may be stored locally on a user's device and
-            synchronized with AquaHub cloud services when connectivity becomes available. Users should protect access to
+          <h2>6. On-device storage and connectivity</h2>
+          <p>The public AquaHub Owner release requires an internet connection to complete checkout. Offline checkout is
+            not available. The app may keep previously loaded information locally and synchronize supported data
+            when connected. Users should protect access to
             their devices because locally stored information may remain accessible to someone who gains unauthorized
             device access.</p>
         </section>
 
         <section id="providers">
           <h2>7. Service providers</h2>
+          <p>Your information may be processed in countries where these providers operate. We use it for the purposes described in this policy, subject to applicable data protection requirements.</p>
           <p>Depending on the feature, AquaHub uses Supabase for account authentication, database, server functions, and
-            related backend services; Firebase services for push notifications and app diagnostics; Google Maps Platform
+            related backend services; Google/Firebase for website hosting, push notifications, app diagnostics, and
+            other enabled app services; Cloudflare for website delivery, security, and web performance measurement;
+            Semaphore for SMS verification where enabled; Google Maps Platform
             for maps and location features; and Google Play for app distribution and digital subscription billing. When
             you independently opt in to AquaHub marketing emails, your subscription details may be synchronized to
             Hostinger Reach to manage marketing contacts, confirmation, campaigns, and suppression. Hostinger Reach is
@@ -143,7 +167,7 @@
           <h2>8. When information may be shared</h2>
           <p>AquaHub does not sell users' personal information. Information may be disclosed where reasonably necessary
             to complete an order between a customer and the selected station, coordinate an assigned delivery, operate
-            through contracted service providers such as Supabase, Firebase, Google, and (for opted-in marketing
+            through contracted service providers such as Supabase, Firebase, Google, Cloudflare, Semaphore, and (for opted-in marketing
             subscriptions) Hostinger Reach, protect AquaHub or its users, investigate fraud or abuse, comply with
             valid legal requests, or meet applicable legal obligations.</p>
           <p>When a customer places an order, relevant order and delivery information may become available to the
@@ -161,8 +185,8 @@
         <section id="security">
           <h2>10. Data security</h2>
           <p>We use reasonable technical and organizational measures intended to protect information, which may include
-            secure authentication, access controls, Firebase security rules, encrypted network connections, server-side
-            authorization, restricted cloud resources, subscription entitlement validation, and security monitoring. No
+            secure authentication, access controls, database row-level policies, encrypted network connections,
+            server-side authorization, restricted cloud resources, subscription entitlement validation, and security monitoring. No
             electronic storage or transmission method can be guaranteed completely secure.</p>
         </section>
 
@@ -171,18 +195,23 @@
           <p>We retain personal information only for as long as reasonably necessary to provide AquaHub services,
             maintain accounts, process orders, maintain legitimate transaction records, prevent fraud, resolve disputes,
             comply with legal obligations, and establish or defend legal claims. Information no longer reasonably
-            required may be deleted, anonymized, or securely disposed of.</p>
-          <p>Marketing consent records and suppression information are retained as needed to honor your preference,
-            prevent future promotional sends after withdrawal, and document consent. Hostinger Reach may retain its own
-            contact and campaign records under its retention terms.</p>
+            required may be deleted, anonymized, or securely disposed of. AquaHub does not currently publish a fixed
+            retention period for these records; the applicable business or legal purpose determines how long a record
+            is kept.</p>
+          <p>When an Owner deletes an account, an active Owner marketing subscription is withdrawn and removal from the
+            email provider is queued. A limited email suppression/consent record may be retained to honor the withdrawal
+            and prevent future promotional sends. The email provider may retain its own records under its terms.</p>
         </section>
 
         <section id="deletion">
           <h2>12. Account and data deletion</h2>
-          <p>Users may request deletion through the AquaHub application where available, through the external <a
-              href="account-deletion.html">Account Deletion page</a>, or by contacting the privacy address listed below.
-            Some information may be retained where necessary or permitted for legal, financial-record, security,
-            fraud-prevention, or dispute-resolution purposes.</p>
+          <p>AquaHub Owner users may delete their account in the app or request deletion by following the external <a
+              href="account-deletion.html">Account Deletion page</a>. Requests made by email require account ownership
+            verification and support processing. The Owner app blocks deletion while sales, payments, or inventory
+            changes remain unsynchronized. Deletion removes the sign-in/profile, unlinks the Owner from the organization,
+            and preserves station business records; see the deletion page for the specific effects. Some information may
+            be retained for business continuity, financial or legal recordkeeping, security, fraud prevention, disputes,
+            or legal claims.</p>
           <p>Deleting an AquaHub account does not necessarily cancel an active Google Play subscription. Subscriptions
             should be cancelled separately through Google Play where applicable.</p>
         </section>
@@ -232,10 +261,14 @@
   </main>
 
   <footer class="site-footer">
-    <div class="container footer-bottom"><span>© <span data-year></span> AquaHub.</span><span><a
-          href="terms.html">Terms</a> · <a href="account-deletion.html">Account deletion</a></span></div>
+    <div class="container footer-bottom"><span>© <span data-year>2026</span> AquaHub.</span>
+      <nav class="footer-legal-links" aria-label="Legal and support">
+        <a href="privacy.html">Privacy</a><a href="terms.html">Terms</a>
+        <a href="subscription-policy.html">Subscriptions</a><a href="account-deletion.html">Account deletion</a><a href="support.html">Support</a>
+      </nav>
+    </div>
   </footer>
-  <script src="main.js" defer></script>
+  <script src="main.js?v=20261025-analytics" defer></script>
 </body>
 
 </html>

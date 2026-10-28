@@ -1,9 +1,6 @@
 import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0";
 import { buildOtpMessage, normalizePhilippinesPhone, toSemaphoreNumber, validateOtp } from "./phone.ts";
-
-// Semaphore's OTP route is dedicated to OTP traffic. The `code` parameter
-// forces Semaphore to send Supabase's code instead of generating a second one.
-const SEMAPHORE_MESSAGES_URL = "https://api.semaphore.co/api/v4/otp";
+import { sendSemaphoreOtp } from "./semaphore.ts";
 
 type HookPayload = {
   user?: { phone?: string };
@@ -81,44 +78,26 @@ Deno.serve(async (request) => {
     sendername: senderName,
   });
 
-  let providerResponse: Response;
-  try {
-    providerResponse = await fetch(SEMAPHORE_MESSAGES_URL, {
-      method: "POST",
-      headers: { "content-type": "application/x-www-form-urlencoded" },
-      body: providerBody,
-    });
-  } catch {
-    console.error("semaphore_request_failed");
-    return jsonError(502, "sms_provider_unavailable");
-  }
-
-  if (!providerResponse.ok) {
-    console.error("semaphore_rejected_request", { status: providerResponse.status });
-    return jsonError(502, "sms_provider_unavailable");
-  }
-
-  // Semaphore can return HTTP 200 while reporting an application-level
-  // failure. Inspect only the status field; never log or return the body.
-  try {
-    const responseBody = await providerResponse.text();
-    if (responseBody.trim()) {
-      const result: unknown = JSON.parse(responseBody);
-      const messages = Array.isArray(result) ? result : [result];
-      const failed = messages.some((entry) => {
-        if (!entry || typeof entry !== "object") return false;
-        const status = (entry as { status?: unknown }).status;
-        return typeof status === "string" && ["failed", "refunded"].includes(status.toLowerCase());
+  const providerResult = await sendSemaphoreOtp(providerBody);
+  if (!providerResult.ok) {
+    if (providerResult.failure === "network") {
+      console.error("semaphore_request_failed", { endpoint: providerResult.endpoint });
+    } else if (providerResult.failure === "reported") {
+      console.error("semaphore_reported_failure", {
+        endpoint: providerResult.endpoint,
+        status: providerResult.status,
       });
-      if (failed) {
-        console.error("semaphore_reported_failure");
-        return jsonError(502, "sms_provider_unavailable");
-      }
+    } else {
+      console.error("semaphore_rejected_request", {
+        endpoint: providerResult.endpoint,
+        status: providerResult.status,
+      });
     }
-  } catch {
-    // The provider has already accepted the HTTP request. Some Semaphore
-    // responses are empty/non-JSON, so do not turn a delivered SMS into an
-    // Auth failure merely because its response body is not parseable.
+    return jsonError(502, "sms_provider_unavailable");
+  }
+
+  if (providerResult.endpoint === "messages") {
+    console.warn("semaphore_otp_fallback_sent");
   }
 
   // Return the explicit JSON success body expected by the Auth hook contract.

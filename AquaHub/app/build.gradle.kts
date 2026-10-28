@@ -1,5 +1,13 @@
 import java.util.Properties
+import java.util.Base64
 import java.net.URI
+import java.security.AlgorithmParameters
+import java.security.KeyFactory
+import java.security.interfaces.ECPublicKey
+import java.security.spec.ECGenParameterSpec
+import java.security.spec.ECParameterSpec
+import java.security.spec.ECFieldFp
+import java.security.spec.X509EncodedKeySpec
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -26,6 +34,23 @@ val mapsApiKey: String = localProperties.getProperty("MAPS_API_KEY") ?: System.g
 // Public verification material only. The matching private signing key belongs
 // exclusively in the server function environment and is never shipped here.
 val offlinePosVerifyPublicKey = configuredValue("OFFLINE_POS_VERIFY_PUBLIC_KEY")
+// QA runs against a separate backend and must never inherit the production
+// offline verifier. Supply a disposable QA verifier via local.properties or
+// OFFLINE_POS_QA_VERIFY_PUBLIC_KEY when exercising offline POS locally.
+val qaOfflinePosVerifyPublicKey = configuredValue("OFFLINE_POS_QA_VERIFY_PUBLIC_KEY")
+val productionOfflinePosEnabled = false
+val qaOfflinePosEnabled = true
+val productionUploadKeystorePath = configuredValue("AQUAHUB_UPLOAD_KEYSTORE")
+    .ifBlank { configuredValue("ANDROID_KEYSTORE_PATH") }
+val productionUploadKeyAlias = configuredValue("AQUAHUB_UPLOAD_KEY_ALIAS")
+    .ifBlank { configuredValue("ANDROID_KEY_ALIAS") }
+val productionUploadKeystorePassword = configuredValue("AQUAHUB_UPLOAD_KEYSTORE_PASSWORD")
+    .ifBlank { configuredValue("ANDROID_KEYSTORE_PASSWORD") }
+val productionUploadKeyPassword = configuredValue("AQUAHUB_UPLOAD_KEY_PASSWORD")
+    .ifBlank { configuredValue("ANDROID_KEY_PASSWORD") }
+val productionUploadKeystoreFile = productionUploadKeystorePath
+    .takeIf(String::isNotBlank)
+    ?.let(rootProject::file)
 // Legacy SUPABASE_URL/SUPABASE_ANON_KEY remain a production-only fallback for
 // existing developer machines. QA never inherits these production values.
 val productionSupabaseUrl = configuredValue("SUPABASE_PRODUCTION_URL")
@@ -47,6 +72,23 @@ fun isHttpsSupabaseEndpoint(value: String): Boolean {
         uri.fragment == null &&
         uri.path.orEmpty().trimEnd('/').isEmpty()
 }
+fun isP256PublicKey(value: String): Boolean = runCatching {
+    val keyBytes = Base64.getDecoder().decode(value)
+    val publicKey = KeyFactory.getInstance("EC")
+        .generatePublic(X509EncodedKeySpec(keyBytes)) as ECPublicKey
+    val actual = publicKey.params
+    val expected = AlgorithmParameters.getInstance("EC").apply {
+        init(ECGenParameterSpec("secp256r1"))
+    }.getParameterSpec(ECParameterSpec::class.java)
+    val actualField = actual.curve.field as? ECFieldFp ?: return@runCatching false
+    val expectedField = expected.curve.field as? ECFieldFp ?: return@runCatching false
+    actualField.p == expectedField.p &&
+        actual.curve.a == expected.curve.a &&
+        actual.curve.b == expected.curve.b &&
+        actual.generator == expected.generator &&
+        actual.order == expected.order &&
+        actual.cofactor == expected.cofactor
+}.getOrDefault(false)
 fun buildConfigString(value: String): String =
     "\"${value.replace("\\", "\\\\").replace("\"", "\\\"")}\""
 
@@ -62,6 +104,17 @@ val validateProductionReleaseSupabaseConfig by tasks.registering {
         }
         check(supabaseHost(productionSupabaseUrl) == productionSupabaseHost) {
             "Production release builds must target the configured AquaHub production Supabase project."
+        }
+        check(!productionOfflinePosEnabled) {
+            "Production release must keep offline POS disabled."
+        }
+        check(
+            productionUploadKeystoreFile?.isFile == true &&
+                productionUploadKeyAlias.isNotBlank() &&
+                productionUploadKeystorePassword.isNotBlank() &&
+                productionUploadKeyPassword.isNotBlank()
+        ) {
+            "Production release requires an existing Android upload keystore and AQUAHUB_UPLOAD_* signing credentials (or the supported ANDROID_* names)."
         }
     }
 }
@@ -79,10 +132,15 @@ val validateQaReleaseSupabaseConfig by tasks.registering {
         check(supabaseHost(qaSupabaseUrl) != productionSupabaseHost) {
             "QA release builds must not target the AquaHub production Supabase project."
         }
+        check(isP256PublicKey(qaOfflinePosVerifyPublicKey)) {
+            "QA release requires OFFLINE_POS_QA_VERIFY_PUBLIC_KEY as a valid P-256 X.509 public key matching the QA offline-pos signing key."
+        }
     }
 }
 
-tasks.matching { it.name == "preProductionReleaseBuild" }.configureEach {
+tasks.matching {
+    it.name == "minifyProductionReleaseWithR8" || it.name == "packageProductionRelease"
+}.configureEach {
     dependsOn(validateProductionReleaseSupabaseConfig)
 }
 tasks.matching { it.name == "preQaReleaseBuild" }.configureEach {
@@ -97,8 +155,8 @@ android {
         applicationId = "com.aesprt.aquahub"
         minSdk = 26
         targetSdk = 37
-        versionCode = 12
-        versionName = "aq-1.0.7"
+        versionCode = 14
+        versionName = "aq-1.0.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -112,6 +170,8 @@ android {
         create("production") {
             dimension = "environment"
             buildConfigField("boolean", "QA_BUILD", "false")
+            buildConfigField("boolean", "OFFLINE_POS_ENABLED", productionOfflinePosEnabled.toString())
+            buildConfigField("String", "OFFLINE_POS_VERIFY_PUBLIC_KEY", "\"\"")
             buildConfigField("String", "SUPABASE_URL", buildConfigString(productionSupabaseUrl))
             buildConfigField("String", "SUPABASE_ANON_KEY", buildConfigString(productionSupabaseAnonKey))
         }
@@ -119,8 +179,10 @@ android {
             dimension = "environment"
             applicationIdSuffix = ".qa"
             buildConfigField("boolean", "QA_BUILD", "true")
+            buildConfigField("boolean", "OFFLINE_POS_ENABLED", qaOfflinePosEnabled.toString())
             buildConfigField("String", "SUPABASE_URL", buildConfigString(qaSupabaseUrl))
             buildConfigField("String", "SUPABASE_ANON_KEY", buildConfigString(qaSupabaseAnonKey))
+            buildConfigField("String", "OFFLINE_POS_VERIFY_PUBLIC_KEY", buildConfigString(qaOfflinePosVerifyPublicKey))
         }
     }
 
@@ -128,6 +190,15 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+
+            if (productionUploadKeystoreFile != null) {
+                signingConfig = signingConfigs.create("productionUpload") {
+                    storeFile = productionUploadKeystoreFile
+                    storePassword = productionUploadKeystorePassword
+                    keyAlias = productionUploadKeyAlias
+                    keyPassword = productionUploadKeyPassword
+                }
+            }
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -235,7 +306,7 @@ dependencies {
     implementation(libs.supabase.postgrest)
     implementation(libs.supabase.storage)
     implementation(libs.supabase.functions)
-    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.okhttp)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

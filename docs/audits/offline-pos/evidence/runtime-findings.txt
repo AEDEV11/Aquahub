@@ -1,0 +1,12 @@
+Android Tablet AVD: Pixel_Tablet, Android API 35 (Google Play x86_64), 2560x1600 at 320 dpi.
+Installed package: com.aesprt.aquahub.qa, variant qaDebug, versionCode 12, versionName aq-1.0.7.
+The app reached its onboarding UI. The captured blocker is an Android system ANR dialog, not an app-thread ANR trace.
+Last ANR reason: Input dispatching timed out (PointerEventDispatcher0 (server) is not responding. Waited 14183ms for MotionEvent).
+The Android process report identified the system process as the nonresponsive component. The onboarding UI was visible behind the dialog; account registration was not completed.
+Local Supabase auth health returned HTTP 200. Local POST /functions/v1/offline-pos returned HTTP 404, body: Function not found.
+Supabase CLI functions serve could not start in this native stack: ServeLocalDbInspectError, no such container supabase_db_WaterStationApp.
+No production writes or production test accounts were created.
+Direct local Deno Edge Function run on loopback was then exercised with the isolated local Supabase Auth and disposable signing key. No-auth and invalid-JWT requests returned 401; GET returned 405; OPTIONS returned 200.
+A transient synthetic local email Auth identity was created under the local stack's configured auto-confirm behavior only for the signer-validation check, then deleted (admin DELETE 200; lookup 404; matching public profile rows 0). This did not validate app UI, phone OTP, or email verification UX.
+An authorize request with an invalid QA public-key fingerprint returned 503 OFFLINE_SIGNING_CONFIGURATION_INVALID before RPC. The matching QA fingerprint passed signer configuration and reached device registration, which correctly returned 403 DEVICE_REGISTRATION_REJECTED for a random nonexistent station. No grant, lease, sale, payment, or inventory reservation was created.
+The standard local gateway route remains unavailable: the app-style /functions/v1/offline-pos request returns 404. Direct loopback Deno serving was used only to test function code and does not validate gateway verify_jwt configuration.

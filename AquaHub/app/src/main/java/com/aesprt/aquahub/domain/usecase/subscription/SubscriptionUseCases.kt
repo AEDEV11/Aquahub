@@ -311,7 +311,14 @@ class RefreshSubscriptionStateUseCase(
         // created on another device) cannot appear as expired just because the
         // local cache has not been populated yet. Offline callers keep using
         // the last cached state.
-        runCatching { subscriptionRepository.refreshFromSupabase() }
+        try {
+            subscriptionRepository.refreshFromSupabase()
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            // Use the cached deadline only when a remote refresh fails;
+            // cancellation must stop this operation without mutating access.
+        }
         return subscriptionRepository.processSubscriptionExpiration(stationId)
     }
 }

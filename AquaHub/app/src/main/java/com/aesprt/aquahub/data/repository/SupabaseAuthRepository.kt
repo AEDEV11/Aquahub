@@ -41,6 +41,7 @@ import com.aesprt.aquahub.sync.SyncResourceType
 import com.aesprt.aquahub.sync.SyncScheduler
 import com.aesprt.aquahub.sync.isVerifiedLegacyOwnerMapping
 import com.aesprt.aquahub.sync.shouldClearLocalAccountCacheAfterLogout
+import com.aesprt.aquahub.sync.countOutstandingLocalOperations
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.functions.functions
 import io.ktor.client.call.body
@@ -291,7 +292,7 @@ class SupabaseAuthRepository(
     override suspend fun logout() = withContext(Dispatchers.IO) {
         localAccountScope.withExclusive {
             deletionReauthenticationUid = null
-            val outstandingWork = database.syncDao().getOutstandingCount()
+            val outstandingWork = outstandingLocalOperationCount()
             authDataSource.signOut()
             authTelemetry.clearUser()
             if (shouldClearLocalAccountCacheAfterLogout(outstandingWork)) {
@@ -313,7 +314,7 @@ class SupabaseAuthRepository(
                 check(ownerDao.getOwnerByFirebaseUid(previousUid) != null) {
                     "The previous account could not be verified. Sign in to that account to recover its data."
                 }
-                check(database.syncDao().getOutstandingCount() == 0) {
+                check(outstandingLocalOperationCount() == 0) {
                     "This device has preserved offline changes. Sign in to the original account to sync or recover them before switching."
                 }
                 check(database.syncDao().hasLocalBusinessData()) {
@@ -499,7 +500,7 @@ class SupabaseAuthRepository(
             localAccountScope.bind(uid)
             return
         }
-        val pendingCount = database.syncDao().getOutstandingCount()
+        val pendingCount = outstandingLocalOperationCount()
         val action = decideAccountScopeAction(
             boundUid = boundUid,
             requestedUid = uid,
@@ -579,6 +580,11 @@ class SupabaseAuthRepository(
         }
     }
 
+    private suspend fun outstandingLocalOperationCount(): Int = countOutstandingLocalOperations(
+        syncOperations = database.syncDao().getOutstandingCount(),
+        offlinePosOperations = database.offlinePosDao().getOutstandingOperationCount(),
+    )
+
     private fun recordLogin(uid: String, method: String) {
         authTelemetry.setUser(uid)
         authTelemetry.login(method)
@@ -628,10 +634,17 @@ internal fun canUseCachedOwnerForOfflineRestore(
     cachedOwnerUid == expectedAuthUid
 
 internal fun requireDeletionIdentity(reauthenticatedUid: String?, currentUid: String) {
-    check(!reauthenticatedUid.isNullOrBlank() && reauthenticatedUid == currentUid) {
+    if (reauthenticatedUid.isNullOrBlank()) {
+        throw AccountDeletionReauthenticationRequiredException()
+    }
+    check(reauthenticatedUid == currentUid) {
         "The signed-in account changed after reauthentication. Sign in again before deleting an account."
     }
 }
+
+internal class AccountDeletionReauthenticationRequiredException : IllegalStateException(
+    "Confirm your password or Google account before deleting this account."
+)
 
 internal fun mayRecoverLegacyOutbox(
     authenticatedUid: String,

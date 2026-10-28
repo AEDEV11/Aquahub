@@ -1,0 +1,14 @@
+AquaHub Owner productionDebug device check
+Date: 2026-10-17
+
+Requested target: productionDebug app APK.
+Tablet AVD attempted: AquaHub_OfflineQA_Tablet_API35_LowRes.
+Emulator binary: Android Emulator 37.2.12.0.
+System image: Android 35 Google APIs Play Store Tablet x86_64.
+Launch options: no snapshot restore, no boot animation, SwiftShader, 2 cores, 2048 MB requested (emulator raised guest RAM to 2560 MB).
+
+Result: the emulator process started, but `adb devices -l` never listed an emulator serial. The AVD was stopped without wiping it. `adb devices -l` showed only the already-connected Samsung physical phone; it was not used or modified. No AquaHub APK was installed, no app was launched, and no instrumentation tests ran.
+
+No production account or backend request was made. No AVD or snapshot was deleted.
+
+Second attempt: existing `Pixel_Tablet` AVD, API 35 Google Play tablet image, dedicated emulator port 5556, SwiftShader, no snapshot, 2 cores and 4096 MB guest RAM (emulator raised the requested 3072 MB). It also failed to expose an ADB serial within the attempt window; `adb connect localhost:5556` returned connection refused. It was stopped without wiping the AVD. No package-presence check was possible because the guest never became available.

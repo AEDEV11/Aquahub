@@ -4,12 +4,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <base href="/" />
   <meta name="theme-color" content="#0284c7" />
   <meta name="description" content="AquaHub Terms of Service." />
+  <link rel="canonical" href="https://aquahub.aesprt.com/terms" />
   <title>Terms of Service — AquaHub</title>
   <link rel="icon" href="assets/favicon-64.png?v=20260927-white-icon" type="image/png" />
-  <link rel="stylesheet" href="styles.css?v=20260917-responsive" />
+  <link rel="stylesheet" href="styles.css?v=20261025-analytics" />
 </head>
 
 <body>
@@ -23,11 +23,11 @@
   </header>
   <main id="main">
     <section class="legal-hero">
-      <div class="container"><a class="back-link" href="index.html">← Back to AquaHub</a>
+      <div class="container"><a class="back-link" href="index.html"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 12H5m7-7-7 7 7 7" /></svg> Back to AquaHub</a>
         <h1>Terms of Service</h1>
         <p>These terms govern use of AquaHub Owner, AquaHub Customer, and related AquaHub services.</p>
         <div class="legal-meta"><span>Effective date: <time datetime="2026-09-14">September 14, 2026</time></span><span>Last
-            updated: <time datetime="2026-09-14T22:20:00+08:00">September 14, 2026 at 10:20 PM PHT (UTC+8)</time></span></div>
+            updated: <time datetime="2026-10-18">October 18, 2026</time></span></div>
       </div>
     </section>
     <div class="container legal-layout">
@@ -40,10 +40,10 @@
           <h2>1. The AquaHub service</h2>
           <p>AquaHub provides technology designed to support the water-refilling station ecosystem. AquaHub Owner may
             provide order, customer, product, inventory, container, rider, delivery, reporting, analytics,
-            multi-station, and subscription-based features. AquaHub Customer may allow users linked to a station through
+            multi-station, and subscription-based features. Participating stations may offer browser ordering without an AquaHub account. AquaHub Customer may also allow users linked to a station through
             its QR code or link to view that station's products, place orders, select delivery or pickup, provide a
             delivery address, track order status, and view order history.</p>
-          <p>Features may change as AquaHub develops.</p>
+          <p>The public Owner release requires an internet connection for checkout; offline sales are not available. Features may vary by plan and release availability.</p>
         </section>
         <section id="accounts">
           <h2>2. Account requirements</h2>
@@ -73,6 +73,11 @@
             order. Orders may be subject to station availability, operating hours, product availability, delivery
             coverage, minimum order requirements, rider availability, and payment confirmation. A station may reject or
             cancel an order for legitimate operational reasons.</p>
+          <p>Payments for physical water orders are made to the station using its available payment options; they are
+            separate from AquaHub Owner digital subscriptions. The station handles fulfillment, order disputes, and
+            applicable water-order refunds. Receipt images and payment references submitted through browser ordering
+            are customer-provided proof, not independent bank or payment-provider settlement verification. Stations
+            should verify receipt of funds with their payment provider.</p>
         </section>
         <section>
           <h2>6. Delivery and location</h2>
@@ -95,7 +100,7 @@
             Play checkout or create a Play charge at trial start. When the trial ends, the app asks the owner to activate
             the paid subscription through Google Play. Google Play subscriptions may then automatically renew unless
             cancelled according to Google Play's subscription management rules.</p>
-          <p>Deleting an AquaHub account or clearing Firebase data does not reset a Google Play account's eligibility for a
+          <p>Deleting an AquaHub account does not reset a Google Play account's eligibility for a
             Google Play introductory offer.</p>
           <p>Uninstalling AquaHub or deleting an AquaHub account does not automatically cancel a Google Play
             subscription.</p>
@@ -138,8 +143,8 @@
           <h2>14. Service availability</h2>
           <p>We aim to provide a reliable service but cannot guarantee uninterrupted availability. Service may be
             affected by internet failures, cloud outages, Google or Firebase services, device failures, maintenance,
-            third-party services, and events outside reasonable control. Offline functionality may support some features
-            but not every service.</p>
+            third-party services, and events outside reasonable control. An unavailable backend prevents new online
+            checkout. Previously loaded device information does not confirm a new sale or payment.</p>
         </section>
         <section>
           <h2>15. Intellectual property</h2>
@@ -183,10 +188,14 @@
     </div>
   </main>
   <footer class="site-footer">
-    <div class="container footer-bottom"><span>© <span data-year></span> AquaHub.</span><span><a
-          href="privacy.html">Privacy</a> · <a href="subscription-policy.html">Subscription policy</a></span></div>
+    <div class="container footer-bottom"><span>© <span data-year>2026</span> AquaHub.</span>
+      <nav class="footer-legal-links" aria-label="Legal and support">
+        <a href="privacy.html">Privacy</a><a href="terms.html">Terms</a>
+        <a href="subscription-policy.html">Subscriptions</a><a href="account-deletion.html">Account deletion</a><a href="support.html">Support</a>
+      </nav>
+    </div>
   </footer>
-  <script src="main.js" defer></script>
+  <script src="main.js?v=20261025-analytics" defer></script>
 </body>
 
 </html>

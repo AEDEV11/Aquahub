@@ -2,22 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://aquahub.aesprt.com/</loc>
-    <lastmod>2026-10-10</lastmod>
+    <lastmod>2026-10-18</lastmod>
   </url>
   <url>
-    <loc>https://aquahub.aesprt.com/support.html</loc>
+    <loc>https://aquahub.aesprt.com/support</loc>
   </url>
   <url>
-    <loc>https://aquahub.aesprt.com/privacy.html</loc>
+    <loc>https://aquahub.aesprt.com/privacy</loc>
   </url>
   <url>
-    <loc>https://aquahub.aesprt.com/terms.html</loc>
+    <loc>https://aquahub.aesprt.com/terms</loc>
   </url>
   <url>
-    <loc>https://aquahub.aesprt.com/subscription-policy.html</loc>
-    <lastmod>2026-10-10</lastmod>
+    <loc>https://aquahub.aesprt.com/subscription-policy</loc>
+    <lastmod>2026-10-18</lastmod>
   </url>
   <url>
-    <loc>https://aquahub.aesprt.com/account-deletion.html</loc>
+    <loc>https://aquahub.aesprt.com/account-deletion</loc>
   </url>
 </urlset>

@@ -35,6 +35,15 @@ class OrderSettlementDecisionTest {
     }
 
     @Test
+    fun `paid online provider order completes without another settlement prompt`() {
+        listOf(PaymentMethod.GCASH, PaymentMethod.MAYA).forEach { method ->
+            val order = Order(paymentMethod = method, paymentStatus = PaymentStatus.PAID)
+
+            assertFalse(order.requiresSettlementConfirmation())
+        }
+    }
+
+    @Test
     fun `unpaid cod order still requires settlement confirmation`() {
         val order = Order(paymentMethod = PaymentMethod.CASH_ON_DELIVERY, paymentStatus = PaymentStatus.PENDING)
 

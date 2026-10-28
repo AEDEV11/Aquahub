@@ -276,6 +276,14 @@ gmp-place-autocomplete { display: block; width: 100%; --gmpx-color-surface: #fff
 .no-payment { display: grid; gap: 6px; padding: 14px; border: 1px solid #f2dfc8; border-radius: 12px; background: #fffaf2; color: #886037; font-size: 10px; }
 .no-payment span { color: #9a866c; }
 .no-payment a { width: fit-content; font-weight: 700; }
+.online-payment-fields { display: grid; gap: 11px; margin-top: 12px; padding: 13px; border: 1px solid #dceafa; border-radius: 13px; background: #f7fbff; }
+.online-payment-instructions { display: grid; gap: 5px; color: #344e6e; font-size: 10px; line-height: 1.45; }
+.online-payment-instructions small { color: #75869e; font-size: 9px; }
+.online-payment-fields .field { gap: 6px; font-size: 10px; }
+.online-payment-fields .field input[type="file"] { min-width: 0; padding: 9px; font-size: 10px; }
+.selected-proof { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #62748c; font-size: 9px; }
+.selected-proof span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.selected-proof button { flex: 0 0 auto; padding: 4px; border: 0; background: transparent; color: var(--blue); font-size: 9px; font-weight: 750; }
 .rules-copy { max-height: 190px; overflow: auto; padding: 13px; border: 1px solid #e7edf4; border-radius: 11px; background: #fbfcfe; color: #576982; font-size: 10px; line-height: 1.65; white-space: normal; }
 .rules-accept { display: flex; align-items: flex-start; gap: 9px; margin-top: 13px; color: #50617a; font-size: 10px; line-height: 1.45; cursor: pointer; }
 .rules-accept input { flex: 0 0 auto; width: 16px; height: 16px; margin: 0; accent-color: var(--blue); }
@@ -307,8 +315,11 @@ gmp-place-autocomplete { display: block; width: 100%; --gmpx-color-surface: #fff
 .summary-line span { display: grid; min-width: 0; gap: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .summary-line span small { overflow: hidden; color: #91a0b2; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
 .summary-line strong { flex: 0 0 auto; color: #4d607b; font-size: 10px; }
+.summary-line strong del { display: block; margin-bottom: 2px; color: #94a0af; font-size: 9px; font-weight: 500; text-align: right; }
 .summary-calculations { display: grid; gap: 11px; padding: 14px 0; border-top: 1px solid #edf1f6; }
 .summary-calculations strong { color: #53647b; font-size: 10px; }
+.summary-calculations .summary-promotion { color: #23845f; }
+.summary-calculations .summary-promotion strong { color: #23845f; }
 .summary-calculations .summary-total { padding-top: 12px; border-top: 1px dashed #e2e9f1; color: #334d6c; font-weight: 800; }
 .summary-calculations .summary-total strong { color: var(--navy); font-size: 19px; letter-spacing: -.035em; }
 .summary-assurance { display: flex; gap: 8px; padding: 11px; border-radius: 11px; background: #f3f8fe; color: #7c8ca2; font-size: 9px; line-height: 1.45; }

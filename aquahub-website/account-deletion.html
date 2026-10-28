@@ -4,12 +4,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <base href="/" />
   <meta name="theme-color" content="#0284c7" />
   <meta name="description" content="Request deletion of an AquaHub account and associated data." />
+  <link rel="canonical" href="https://aquahub.aesprt.com/account-deletion" />
   <title>Account Deletion — AquaHub</title>
   <link rel="icon" href="assets/favicon-64.png?v=20260927-white-icon" type="image/png" />
-  <link rel="stylesheet" href="styles.css?v=20260917-responsive" />
+  <link rel="stylesheet" href="styles.css?v=20261025-analytics" />
 </head>
 
 <body>
@@ -23,10 +23,9 @@
   </header>
   <main id="main">
     <section class="legal-hero">
-      <div class="container"><a class="back-link" href="index.html">← Back to AquaHub</a>
+      <div class="container"><a class="back-link" href="index.html"><svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 12H5m7-7-7 7 7 7" /></svg> Back to AquaHub</a>
         <h1>Account & Data Deletion</h1>
-        <p>How AquaHub Owner and AquaHub Customer users can request deletion of their account and associated personal
-          information.</p>
+        <p>How AquaHub Owner users can request deletion of their account and related personal information.</p>
       </div>
     </section>
     <div class="container legal-layout">
@@ -35,50 +34,57 @@
           retained</a><a href="#subscriptions">Subscriptions</a><a href="#contact">Contact</a></aside>
       <article class="legal-document">
         <section id="in-app">
-          <h2>1. Delete your account in the app</h2>
+          <h2>1. Delete your AquaHub Owner account in the app</h2>
           <ol>
-            <li>Open AquaHub Owner or AquaHub Customer.</li>
+            <li>Open AquaHub Owner and sign in to the account you want to delete.</li>
             <li>Go to <strong>Settings</strong>.</li>
-            <li>Select <strong>Account</strong>.</li>
-            <li>Select <strong>Delete Account</strong>.</li>
-            <li>Review the deletion information.</li>
-            <li>Confirm the deletion request.</li>
+            <li>Select <strong>Delete AquaHub Account</strong>.</li>
+            <li>Review what will happen, then continue and confirm <strong>Delete Account</strong>.</li>
+            <li>If asked, sign in again to verify your identity.</li>
           </ol>
-          <div class="legal-callout">The production app should implement a real account-deletion workflow. Do not
-            publish this step until the feature actually exists.</div>
+          <p>The app will not start deletion while sale, payment, or inventory changes are still waiting to sync. Sync
+            those changes first. Deletion removes the sign-in and profile and clears the app's local account cache after
+            the server confirms deletion.</p>
         </section>
         <section id="without-app">
           <h2>2. Request deletion without the app</h2>
-          <p>If you no longer have access to AquaHub, email <a data-privacy-email href="mailto:adriel.dev.123@gmail.com">adriel.dev.123@gmail.com</a>
-            with the subject <strong>AquaHub Account Deletion Request</strong>.</p>
-          <p>Please include the email address associated with your AquaHub account. We may request reasonable
-            information necessary to verify account ownership before deletion.</p>
+          <p>If you cannot use the app, email <a data-privacy-email href="mailto:adriel.dev.123@gmail.com">adriel.dev.123@gmail.com</a>
+            with the subject <strong>AquaHub Account Deletion Request</strong>.
+            <a class="text-link" href="mailto:adriel.dev.123@gmail.com?subject=AquaHub%20Account%20Deletion%20Request" data-email-link data-email-subject="AquaHub Account Deletion Request">Start an account deletion request <svg class="site-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 17 17 7M7 7h10v10" /></svg></a></p>
+          <p>For a browser order without an AquaHub account, contact the same privacy address with your order number and the contact details used for the order. The station may need to participate in verifying and handling the request.</p>
+          <p>Include the email address associated with your AquaHub Owner account. We may ask you to verify ownership
+            before processing the request. Do not send your password, one-time passcode, or purchase token by email.</p>
         </section>
         <section id="deleted">
-          <h2>3. What may be deleted</h2>
-          <p>Depending on the account and how AquaHub was used, deletion may include:</p>
+          <h2>3. What is deleted</h2>
+          <p>When the request completes, the current AquaHub Owner deletion flow:</p>
           <ul>
-            <li>AquaHub account profile and authentication account.</li>
-            <li>Contact information and saved customer profile information.</li>
-            <li>Saved delivery addresses.</li>
-            <li>Notification identifiers and app preferences.</li>
-            <li>Other personal information associated with the account that is not required to be retained.</li>
+            <li>Deletes the AquaHub sign-in account and its linked Owner profile.</li>
+            <li>Removes your identity from audit records and clears the app's local account cache.</li>
+            <li>Withdraws an active AquaHub Owner marketing subscription and queues removal from the email provider.</li>
           </ul>
         </section>
         <section id="retained">
           <h2>4. Information that may be retained</h2>
-          <p>Certain information may be retained when reasonably necessary or legally required for fraud prevention,
-            security, legal compliance, dispute resolution, financial or transactional recordkeeping, or establishing,
-            exercising, or defending legal claims.</p>
-          <p>Some completed order records may need to remain within a station's business records. Where appropriate,
-            personal information may be deleted, minimized, or anonymized while required transactional information is
-            retained.</p>
+          <p>Station and business records—including products, inventory, orders, payments, expenses, and reports—are not
+            deleted by the current Owner account flow. The Owner profile is unlinked from its organization, so deleting
+            the account removes your access and does not transfer station ownership. Contact support before deletion if
+            another person needs access to those records.</p>
+          <p>For orders where the deleted account was recorded as the customer, associated contact, delivery, and note
+            fields are removed or replaced with generic values. Financial and transaction records may be retained for
+            business continuity, security, dispute resolution, legal or accounting obligations, and legal claims.</p>
+          <p>If an active Owner marketing subscription exists, AquaHub withdraws consent and requests provider removal.
+            A limited email suppression/consent record may remain to honor the withdrawal and prevent future promotional
+            sends. The provider may take time to complete a queued removal.</p>
+          <p>AquaHub does not currently publish a fixed retention period for records that must be kept. They are retained
+            only while a stated business or legal purpose applies. Contact the privacy address below to ask about a
+            specific record.</p>
         </section>
         <section>
           <h2>5. Water station owners</h2>
-          <p>Deleting an AquaHub Owner account may affect access to station information, inventory, orders, customers,
-            reports, rider management, and subscription features. Owners should export any records they are legally
-            required to retain before requesting deletion.</p>
+          <p>Deletion unlinks the Owner profile from its organization. It does not delete or transfer that station's
+            business records. Make arrangements with AquaHub support before requesting deletion if station records need
+            to remain accessible to someone else.</p>
         </section>
         <section id="subscriptions">
           <h2>6. Google Play subscriptions</h2>
@@ -94,8 +100,10 @@
         </section>
         <section>
           <h2>7. Processing time</h2>
-          <p>We aim to process verified deletion requests within a reasonable period. We may contact you if additional
-            verification is required.</p>
+          <p>The in-app request runs when you confirm it and the server accepts it. Email requests require ownership
+            verification and support processing. AquaHub has not set a fixed completion period for email requests; we
+            will contact you if more information is needed. Provider removal of a marketing contact is queued and may
+            complete later.</p>
         </section>
         <section id="contact">
           <h2>8. Questions</h2>
@@ -106,10 +114,14 @@
     </div>
   </main>
   <footer class="site-footer">
-    <div class="container footer-bottom"><span>© <span data-year></span> AquaHub.</span><span><a
-          href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a></span></div>
+    <div class="container footer-bottom"><span>© <span data-year>2026</span> AquaHub.</span>
+      <nav class="footer-legal-links" aria-label="Legal and support">
+        <a href="privacy.html">Privacy</a><a href="terms.html">Terms</a>
+        <a href="subscription-policy.html">Subscriptions</a><a href="account-deletion.html">Account deletion</a><a href="support.html">Support</a>
+      </nav>
+    </div>
   </footer>
-  <script src="main.js" defer></script>
+  <script src="main.js?v=20261025-analytics" defer></script>
 </body>
 
 </html>

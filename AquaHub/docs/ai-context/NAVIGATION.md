@@ -47,6 +47,7 @@ Quick walk-in sale is presented as a sheet from the main container rather than a
 - The nested `rememberNavController()` remains owned by `MainContainerScreen`; changing the navigation presentation does not key or recreate the nested `NavHost`. Destination taps keep the existing `saveState`, `restoreState`, and `launchSingleTop` behavior.
 - The mobile and tablet presentations share the same destination items and selected-route mapping. Secondary operational routes remain reachable through existing settings and quick-action entry points.
 - Authentication routing is decided from splash/session/onboarding state. Avoid firing repeated navigation from recomposition; consume events or use stable effect keys.
+- After authentication or setup completes, the root stack must not retain splash, login, onboarding, or registration destinations beneath `main_container`; Android Back must not return to an authenticated user's auth screen.
 - Detail arguments are local numeric Room IDs. Remote IDs must be mapped before navigation.
 - No manifest/NavGraph deep links are implemented. FCM does not provide a complete order-routing contract.
 - Root and nested controller ownership is split by the main container. Add a destination at the layer that owns its chrome/back behavior rather than creating another controller.

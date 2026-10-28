@@ -34,6 +34,11 @@ data class SupabaseCreatedOrder(
     val items: List<OrderItem>,
 )
 
+class CheckoutConfirmationUnavailableException(cause: Throwable) : Exception(
+    "AquaHub could not confirm this sale. Keep this checkout open and retry. Check transaction history before starting another sale.",
+    cause,
+)
+
 @Serializable
 private data class SupabaseCreateOrderResult(
     @SerialName("order_id") val orderId: String,
@@ -121,47 +126,60 @@ class SupabaseOrderDataSource(
                 ?: error("Product $localProduct is not provisioned in Supabase.")
             product to item.quantity
         }
-        val created = supabase.postgrest.rpc("create_order", buildJsonObject {
-            put("p_station_id", station)
-            put("p_client_operation_id", clientOperationId)
-            put("p_source", "OWNER_WALK_IN")
-            put("p_customer_id", customer)
-            put("p_customer_name", customerName)
-            put("p_customer_phone", customerPhone)
-            put("p_items", buildJsonArray { remoteItems.forEach { (id, quantity) -> add(buildJsonObject { put("product_id", id); put("quantity", quantity) }) } })
-            put("p_delivery_mode", deliveryMode)
-            put("p_delivery_address", deliveryAddress)
-            put("p_delivery_place_id", null as String?)
-            put("p_delivery_latitude", deliveryLatitude)
-            put("p_delivery_longitude", deliveryLongitude)
-            put("p_delivery_fee_centavos", deliveryFeeCentavos)
-            put("p_payment_method", paymentMethod)
-            put("p_customer_note", notes)
-        }).decodeList<SupabaseCreateOrderResult>().single()
+        val created = try {
+            supabase.postgrest.rpc("create_order", buildJsonObject {
+                put("p_station_id", station)
+                put("p_client_operation_id", clientOperationId)
+                put("p_source", "OWNER_WALK_IN")
+                put("p_customer_id", customer)
+                put("p_customer_name", customerName)
+                put("p_customer_phone", customerPhone)
+                put("p_items", buildJsonArray { remoteItems.forEach { (id, quantity) -> add(buildJsonObject { put("product_id", id); put("quantity", quantity) }) } })
+                put("p_delivery_mode", deliveryMode)
+                put("p_delivery_address", deliveryAddress)
+                put("p_delivery_place_id", null as String?)
+                put("p_delivery_latitude", deliveryLatitude)
+                put("p_delivery_longitude", deliveryLongitude)
+                put("p_delivery_fee_centavos", deliveryFeeCentavos)
+                put("p_payment_method", paymentMethod)
+                put("p_customer_note", notes)
+            }).decodeList<SupabaseCreateOrderResult>().single()
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            throw CheckoutConfirmationUnavailableException(error)
+        }
         // The RPC applies current server-side pricing/promotions. Read the
         // committed snapshot so Room and receipts never keep stale local prices
         // or an optimistic payment/order state.
-        val snapshot = supabase.from("orders").select {
-            filter { eq("id", created.orderId) }
-        }.decodeList<SupabaseCreatedOrderSnapshot>().single()
-        val persistedItems = supabase.from("order_items").select {
-            filter { eq("order_id", created.orderId) }
-        }.decodeList<SupabaseCreatedOrderItem>().map { item ->
-            val productType = com.aesprt.aquahub.domain.model.ProductType.entries
-                .firstOrNull { it.name.equals(item.productType, ignoreCase = true) }
-                ?: error("Supabase returned an unsupported product type: ${item.productType}")
-            OrderItem(
-                productId = item.productId?.let { remoteId ->
-                    syncDao.getMetadataByRemoteId("PRODUCT", remoteId)?.localId
-                },
-                productName = item.productName,
-                productType = productType,
-                sizeLabel = item.sizeLabel,
-                unitPrice = item.unitPriceCentavos / 100.0,
-                quantity = item.quantity,
-                subtotal = item.subtotalCentavos / 100.0,
-                containerSource = item.containerSource
-            )
+        val (snapshot, persistedItems) = try {
+            val orderSnapshot = supabase.from("orders").select {
+                filter { eq("id", created.orderId) }
+            }.decodeList<SupabaseCreatedOrderSnapshot>().single()
+            val itemsSnapshot = supabase.from("order_items").select {
+                filter { eq("order_id", created.orderId) }
+            }.decodeList<SupabaseCreatedOrderItem>().map { item ->
+                val productType = com.aesprt.aquahub.domain.model.ProductType.entries
+                    .firstOrNull { it.name.equals(item.productType, ignoreCase = true) }
+                    ?: error("Supabase returned an unsupported product type: ${item.productType}")
+                OrderItem(
+                    productId = item.productId?.let { remoteId ->
+                        syncDao.getMetadataByRemoteId("PRODUCT", remoteId)?.localId
+                    },
+                    productName = item.productName,
+                    productType = productType,
+                    sizeLabel = item.sizeLabel,
+                    unitPrice = item.unitPriceCentavos / 100.0,
+                    quantity = item.quantity,
+                    subtotal = item.subtotalCentavos / 100.0,
+                    containerSource = item.containerSource
+                )
+            }
+            orderSnapshot to itemsSnapshot
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (error: Exception) {
+            throw CheckoutConfirmationUnavailableException(error)
         }
         return SupabaseCreatedOrder(
             orderId = created.orderId,

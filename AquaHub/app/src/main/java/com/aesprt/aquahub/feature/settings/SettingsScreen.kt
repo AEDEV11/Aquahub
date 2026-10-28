@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import com.aesprt.aquahub.R
 import androidx.credentials.CredentialManager
+import androidx.credentials.exceptions.NoCredentialException
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.exceptions.GetCredentialException
@@ -242,6 +243,8 @@ fun SettingsContent(
                                         } else {
                                             localReauthError = "Google returned an unsupported credential."
                                         }
+                                    } catch (_: NoCredentialException) {
+                                        localReauthError = "No Google account is available for verification. Try another sign-in method."
                                     } catch (error: GetCredentialException) {
                                         localReauthError = error.message ?: "Google reauthentication was cancelled."
                                     }
@@ -635,9 +638,10 @@ private fun AccountDeletionWarningDialog(
                 ) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(16.dp)) {
                         Text("This will:", fontWeight = FontWeight.Bold)
-                        Text("• Remove your owner sign-in and profile")
-                        Text("• Stop online ordering for owned stations")
-                        Text("• Keep historical orders and reports for business continuity")
+                        Text("• Remove your Owner sign-in and profile")
+                        Text("• Keep station records but remove your access; ownership is not transferred")
+                        Text("• Keep business history; customer contact details tied to your account are removed")
+                        Text("• Withdraw any active Owner marketing subscription")
                     }
                 }
 

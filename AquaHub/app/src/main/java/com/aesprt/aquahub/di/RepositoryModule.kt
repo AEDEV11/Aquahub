@@ -77,7 +77,9 @@ val repositoryModule = module {
             syncQueue = get(),
             syncDao = get(),
             stationDao = get(),
-            supabaseCatalog = get()
+            supabaseCatalog = get(),
+            supabaseContainer = get(),
+            containerMovementPullApplier = get()
         )
     }
 
@@ -110,6 +112,13 @@ val repositoryModule = module {
     single { SupabaseOfflinePosDataSource() }
     single { OfflinePosCryptography() }
     single { SupabaseContainerDataSource() }
+    single {
+        com.aesprt.aquahub.sync.ContainerMovementPullApplier(
+            database = get(),
+            transactionDao = get(),
+            syncDao = get()
+        )
+    }
     single { SupabaseOrderDataSource(syncDao = get(), catalog = get()) }
     single { com.aesprt.aquahub.data.supabase.payment.SupabasePaymentDataSource() }
     single { com.aesprt.aquahub.data.supabase.delivery.SupabaseDeliveryDataSource() }

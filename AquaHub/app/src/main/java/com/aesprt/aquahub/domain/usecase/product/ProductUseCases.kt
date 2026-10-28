@@ -117,7 +117,6 @@ class UpdateProductStockUseCase(
         if (access(product.stationId, com.aesprt.aquahub.domain.model.SubscriptionFeature.BASIC_INVENTORY) !is com.aesprt.aquahub.domain.model.SubscriptionAccessResult.Allowed)
             return Result.failure(AppError.ValidationError("Inventory is unavailable for your subscription"))
         return runCatching { productRepository.updateStock(productId, newStock) }
-            .map { Unit }
     }
 }
 

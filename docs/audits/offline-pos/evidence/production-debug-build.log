@@ -1,0 +1,124 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.8.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preProductionDebugBuild UP-TO-DATE
+> Task :app:generateProductionDebugBuildConfig UP-TO-DATE
+> Task :app:generateProductionDebugResources UP-TO-DATE
+> Task :app:injectCrashlyticsMappingFileIdProductionDebug UP-TO-DATE
+> Task :app:injectCrashlyticsVersionControlInfoProductionDebug UP-TO-DATE
+> Task :app:processProductionDebugGoogleServices UP-TO-DATE
+> Task :app:packageProductionDebugResources UP-TO-DATE
+> Task :app:processProductionDebugNavigationResources UP-TO-DATE
+> Task :app:parseProductionDebugLocalResources UP-TO-DATE
+> Task :app:generateProductionDebugRFile UP-TO-DATE
+> Task :app:kspProductionDebugKotlin UP-TO-DATE
+> Task :app:compileProductionDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileProductionDebug UP-TO-DATE
+> Task :app:compileProductionDebugJavaWithJavac UP-TO-DATE
+> Task :app:checkProductionDebugAarMetadata UP-TO-DATE
+> Task :app:mapProductionDebugSourceSetPaths UP-TO-DATE
+> Task :app:compileProductionDebugNavigationResources UP-TO-DATE
+> Task :app:mergeProductionDebugResources UP-TO-DATE
+> Task :app:createProductionDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksProductionDebug UP-TO-DATE
+> Task :app:processProductionDebugMainManifest UP-TO-DATE
+> Task :app:processProductionDebugManifest UP-TO-DATE
+> Task :app:processProductionDebugManifestForPackage UP-TO-DATE
+> Task :app:processProductionDebugResources UP-TO-DATE
+> Task :app:bundleProductionDebugClassesToRuntimeJar
+> Task :app:bundleProductionDebugClassesToCompileJar
+> Task :app:kspProductionDebugUnitTestKotlin
+> Task :app:preProductionDebugUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileProductionDebugUnitTest FROM-CACHE
+> Task :app:processProductionDebugJavaRes UP-TO-DATE
+> Task :app:preProductionDebugAndroidTestBuild SKIPPED
+> Task :app:generateProductionDebugAndroidTestLintModel
+> Task :app:extractProguardFiles UP-TO-DATE
+> Task :app:generateProductionDebugLintReportModel
+> Task :app:generateProductionDebugUnitTestLintModel
+> Task :app:compileProductionDebugUnitTestKotlin
+> Task :app:lintAnalyzeProductionDebug
+> Task :app:compileProductionDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processProductionDebugUnitTestJavaRes
+> Task :app:testProductionDebugUnitTest
+> Task :app:lintAnalyzeProductionDebugAndroidTest
+> Task :app:lintAnalyzeProductionDebugUnitTest
+> Task :app:mergeProductionDebugNativeDebugMetadata NO-SOURCE
+> Task :app:generateProductionDebugAssets UP-TO-DATE
+> Task :app:mergeProductionDebugAssets UP-TO-DATE
+> Task :app:compressProductionDebugAssets UP-TO-DATE
+> Task :app:generateProductionDebugGlobalSynthetics UP-TO-DATE
+> Task :app:checkProductionDebugDuplicateClasses UP-TO-DATE
+> Task :app:desugarProductionDebugFileDependencies UP-TO-DATE
+> Task :app:mergeExtDexProductionDebug UP-TO-DATE
+> Task :app:mergeLibDexProductionDebug UP-TO-DATE
+> Task :app:mergeProductionDebugJavaResource UP-TO-DATE
+> Task :app:dexBuilderProductionDebug UP-TO-DATE
+> Task :app:mergeProjectDexProductionDebug UP-TO-DATE
+> Task :app:mergeProductionDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeProductionDebugNativeLibs UP-TO-DATE
+> Task :app:stripProductionDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningProductionDebug UP-TO-DATE
+> Task :app:writeProductionDebugAppMetadata UP-TO-DATE
+> Task :app:writeProductionDebugSigningConfigVersions UP-TO-DATE
+> Task :app:packageProductionDebug UP-TO-DATE
+> Task :app:createProductionDebugApkListingFileRedirect UP-TO-DATE
+> Task :app:assembleProductionDebug UP-TO-DATE
+> Task :app:mergeProductionDebugAndroidTestManifest
+> Task :app:processProductionDebugAndroidTestManifest
+> Task :app:generateProductionDebugAndroidTestBuildConfig
+> Task :app:generateProductionDebugAndroidTestResources FROM-CACHE
+> Task :app:packageProductionDebugAndroidTestResources
+> Task :app:processProductionDebugAndroidTestNavigationResources FROM-CACHE
+> Task :app:parseProductionDebugAndroidTestLocalResources FROM-CACHE
+> Task :app:generateProductionDebugAndroidTestRFile FROM-CACHE
+> Task :app:kspProductionDebugAndroidTestKotlin
+> Task :app:compileProductionDebugAndroidTestKotlin
+w: file:///home/adrielespiritu/StudioProjects/Aquahub/AquaHub/app/src/androidTest/java/com/aesprt/aquahub/data/offline/OfflinePosDisposableE2eTest.kt:335:67 Unnecessary non-null assertion (!!) on a non-null receiver of type 'Long'.
+w: file:///home/adrielespiritu/StudioProjects/Aquahub/AquaHub/app/src/androidTest/java/com/aesprt/aquahub/feature/settings/subscription/SubscriptionBillingLayoutTest.kt:34:33 'fun createComposeRule(effectContext: CoroutineContext = ...): ComposeContentTestRule' is deprecated. Use `androidx.compose.ui.test.junit4.v2.createComposeRule` instead. The v2 APIs use StandardTestDispatcher instead of UnconfinedTestDispatcher, which aligns with standard coroutine behavior by queuing tasks rather than executing them immediately. Tests relying on immediate execution may require explicit synchronization. Please refer to the migration guide for more details.
+w: file:///home/adrielespiritu/StudioProjects/Aquahub/AquaHub/app/src/androidTest/java/com/aesprt/aquahub/ui/CustomerAndPaymentUiTest.kt:30:23 'fun createComposeRule(effectContext: CoroutineContext = ...): ComposeContentTestRule' is deprecated. Use `androidx.compose.ui.test.junit4.v2.createComposeRule` instead. The v2 APIs use StandardTestDispatcher instead of UnconfinedTestDispatcher, which aligns with standard coroutine behavior by queuing tasks rather than executing them immediately. Tests relying on immediate execution may require explicit synchronization. Please refer to the migration guide for more details.
+
+> Task :app:javaPreCompileProductionDebugAndroidTest FROM-CACHE
+> Task :app:compileProductionDebugAndroidTestJavaWithJavac
+> Task :app:generateProductionDebugAndroidTestAssets UP-TO-DATE
+> Task :app:mergeProductionDebugAndroidTestAssets
+> Task :app:compressProductionDebugAndroidTestAssets FROM-CACHE
+> Task :app:generateProductionDebugAndroidTestGlobalSynthetics FROM-CACHE
+> Task :app:checkProductionDebugAndroidTestDuplicateClasses
+> Task :app:desugarProductionDebugAndroidTestFileDependencies FROM-CACHE
+> Task :app:mergeExtDexProductionDebugAndroidTest FROM-CACHE
+> Task :app:mergeLibDexProductionDebugAndroidTest FROM-CACHE
+> Task :app:processProductionDebugAndroidTestJavaRes
+> Task :app:mergeProductionDebugAndroidTestJavaResource
+> Task :app:checkProductionDebugAndroidTestAarMetadata
+> Task :app:mapProductionDebugAndroidTestSourceSetPaths
+> Task :app:compileProductionDebugAndroidTestNavigationResources FROM-CACHE
+> Task :app:mergeProductionDebugAndroidTestResources
+> Task :app:processProductionDebugAndroidTestResources
+> Task :app:dexBuilderProductionDebugAndroidTest
+> Task :app:mergeProjectDexProductionDebugAndroidTest
+> Task :app:mergeProductionDebugAndroidTestJniLibFolders
+> Task :app:mergeProductionDebugAndroidTestNativeLibs NO-SOURCE
+> Task :app:stripProductionDebugAndroidTestDebugSymbols NO-SOURCE
+> Task :app:validateSigningProductionDebugAndroidTest
+> Task :app:writeProductionDebugAndroidTestSigningConfigVersions
+> Task :app:packageProductionDebugAndroidTest
+> Task :app:createProductionDebugAndroidTestApkListingFileRedirect
+> Task :app:assembleProductionDebugAndroidTest
+
+> Task :app:lintReportProductionDebug
+Wrote HTML report to file:///home/adrielespiritu/StudioProjects/Aquahub/AquaHub/app/build/reports/lint-results-productionDebug.html
+Wrote SARIF report to file:///home/adrielespiritu/StudioProjects/Aquahub/AquaHub/app/build/reports/lint-results-productionDebug.sarif
+
+> Task :app:lintProductionDebug
+
+[Incubating] Problems report is available at: file:///home/adrielespiritu/StudioProjects/Aquahub/AquaHub/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.8.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 8m 34s
+91 actionable tasks: 36 executed, 12 from cache, 43 up-to-date

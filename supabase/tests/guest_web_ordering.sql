@@ -20,15 +20,21 @@ declare
   second_order_request jsonb;
   limit_order_request jsonb;
   feature_order_request jsonb;
+  account_order_request jsonb;
+  online_payment_request jsonb;
   result jsonb;
   second_result jsonb;
   limit_result jsonb;
   feature_result jsonb;
+  account_result jsonb;
+  online_payment_result jsonb;
+  online_payment_row record;
   retry_result jsonb;
   resume_result jsonb;
   tracking jsonb;
   err text;
   current_quantity integer;
+  online_proof_path text;
   first_customer_id uuid;
   second_customer_id uuid;
   other_station_customer_id uuid;
@@ -71,10 +77,10 @@ begin
   insert into public.products (
     id, station_id, name, product_type, size_label, price_centavos,
     is_active, is_available, promotion_label, promotion_type,
-    promotional_price_centavos, promotion_minimum_quantity, promotion_is_active
+    promotion_percent_bps, promotional_price_centavos, promotion_minimum_quantity, promotion_is_active
   ) values (
     v_product_id, v_station_id, 'Purified refill', 'REFILL', '5 gal', 5000,
-    true, true, '2 or more', 'QUANTITY_BREAK', 4000, 2, true
+    true, true, '2 or more', 'QUANTITY_BREAK', 2000, null, 2, true
   );
   insert into public.products (
     id, station_id, name, product_type, size_label, price_centavos, is_active, is_available
@@ -166,6 +172,9 @@ begin
     or second_customer_id is distinct from first_customer_id
     or (select c.total_orders from public.customers c where c.id = first_customer_id) is distinct from 2 then
     raise exception 'a later guest order did not reuse its station customer and increment its count once';
+  end if;
+  if (second_result ->> 'total_centavos')::bigint is distinct from 6500::bigint then
+    raise exception 'quantity-break promotion applied below its configured threshold';
   end if;
 
   -- Simulate legacy rows created before auto-linking. The idempotent backfill
@@ -389,6 +398,21 @@ begin
   end if;
   update public.stations set delivery_radius_km = 10 where id = v_station_id;
 
+  update public.stations set cash_payment_enabled = true where id = v_station_id;
+  begin
+    perform public.create_guest_order('GUEST001', jsonb_set(
+      jsonb_set(order_request,
+        '{operation_id}', to_jsonb('guest:12121212-1212-4121-8121-121212121212'::text)),
+      '{payment_method}', to_jsonb('CASH'::text)
+    ), repeat('Q', 43));
+    err := 'no error';
+  exception when others then err := sqlerrm;
+  end;
+  update public.stations set cash_payment_enabled = false where id = v_station_id;
+  if err not like '%cash is only available for pickup%' then
+    raise exception 'cash delivery was accepted by the guest order API: %', err;
+  end if;
+
   begin
     perform public.create_guest_order('GUEST001', jsonb_set(
       jsonb_set(order_request, '{operation_id}', to_jsonb('guest:33333333-3333-4333-8333-333333333333'::text)),
@@ -559,6 +583,116 @@ begin
     ) then
     raise exception 'disabled customer management blocked checkout or lost guest contact details';
   end if;
+
+  if not exists (
+    select 1 from public.get_public_station_account_receivable_eligibility(array[v_station_id]) eligibility
+     where eligibility.station_id = v_station_id and eligibility.is_account_balance_available
+  ) then
+    raise exception 'Business account-billing entitlement was not exposed as a boolean eligibility result';
+  end if;
+  account_order_request := jsonb_set(
+    jsonb_set(
+      jsonb_set(
+        jsonb_set(
+          jsonb_set(
+            jsonb_set(
+              jsonb_set(order_request,
+                '{operation_id}', to_jsonb('guest:13111111-1111-4111-8111-111111111111'::text)),
+              '{request_fingerprint}', to_jsonb(repeat('e', 64))
+            ),
+            '{delivery_mode}', to_jsonb('PICKUP'::text)
+          ),
+          '{payment_method}', to_jsonb('CLIENT_ACCOUNT'::text)
+        ),
+        '{accepted_rules_version}', to_jsonb('4'::text)
+      ),
+      '{items,0,quantity}', '1'::jsonb
+    ),
+    '{delivery_address}', to_jsonb(''::text)
+  );
+  account_order_request := jsonb_set(account_order_request, '{delivery_place_id}', 'null'::jsonb);
+  account_order_request := jsonb_set(account_order_request, '{latitude}', 'null'::jsonb);
+  account_order_request := jsonb_set(account_order_request, '{longitude}', 'null'::jsonb);
+  update public.plan_features
+     set enabled = false
+   where plan_id = (select p.id from public.subscription_plans p where p.code = 'BUSINESS')
+     and feature = 'ACCOUNTS_RECEIVABLE';
+  begin
+    perform public.create_guest_order_with_container_sources(
+      'GUEST001',
+      jsonb_set(jsonb_set(account_order_request,
+        '{operation_id}', to_jsonb('guest:15111111-1111-4111-8111-111111111111'::text)),
+        '{request_fingerprint}', to_jsonb(repeat('a', 64))),
+      repeat('R', 43)
+    );
+    err := 'no error';
+  exception when others then err := sqlerrm;
+  end;
+  if err not like '%subscription feature is not available%' then
+    raise exception 'account-balance checkout bypassed the account-receivable plan feature: %', err;
+  end if;
+  if exists (
+    select 1 from public.get_public_station_account_receivable_eligibility(array[v_station_id]) eligibility
+     where eligibility.station_id = v_station_id and eligibility.is_account_balance_available
+  ) then
+    raise exception 'public account-balance eligibility stayed enabled after disabling its plan feature';
+  end if;
+  update public.plan_features
+     set enabled = true
+   where plan_id = (select p.id from public.subscription_plans p where p.code = 'BUSINESS')
+     and feature = 'ACCOUNTS_RECEIVABLE';
+  account_result := public.create_guest_order_with_container_sources(
+    'GUEST001', account_order_request, repeat('N', 43)
+  );
+  if account_result ->> 'created' is distinct from 'true'
+     or not exists (
+       select 1 from public.orders o
+        where o.id = (account_result ->> 'order_id')::uuid
+          and o.payment_method = 'CLIENT_ACCOUNT'
+          and o.payment_status = 'PENDING'
+          and o.delivery_mode = 'PICKUP'
+          and o.customer_id = first_customer_id
+     ) then
+    raise exception 'pickup account-balance order was not saved as an unpaid client-account charge';
+  end if;
+
+  online_payment_request := jsonb_set(
+    jsonb_set(account_order_request,
+      '{operation_id}', to_jsonb('guest:14111111-1111-4111-8111-111111111111'::text)),
+    '{request_fingerprint}', to_jsonb(repeat('f', 64))
+  );
+  online_payment_request := jsonb_set(online_payment_request, '{payment_method}', to_jsonb('MAYA'::text));
+  online_payment_result := public.create_guest_order_with_container_sources(
+    'GUEST001', online_payment_request, repeat('P', 43)
+  );
+  online_proof_path := 'organizations/' || v_organization_id::text
+    || '/stations/' || v_station_id::text
+    || '/customer-payment-proofs/' || (online_payment_result ->> 'order_id')
+    || '/' || gen_random_uuid()::text || '.png';
+  insert into storage.objects (bucket_id, name, metadata)
+  values ('payment-assets', online_proof_path, jsonb_build_object('mimetype', 'image/png', 'size', 8));
+  select * into online_payment_row
+    from public.record_guest_online_payment(
+      (online_payment_result ->> 'order_id')::uuid,
+      repeat('P', 43), 'MAYA', 'MAYA-TEST-REFERENCE', online_proof_path
+    );
+  if online_payment_result ->> 'created' is distinct from 'true'
+     or online_payment_row.created is distinct from true
+     or online_payment_row.status is distinct from 'PAID'
+     or online_payment_row.amount_centavos is distinct from (online_payment_result ->> 'total_centavos')::bigint
+     or not exists (
+       select 1 from public.orders o
+        join public.payments p on p.order_id = o.id
+        where o.id = (online_payment_result ->> 'order_id')::uuid
+          and o.payment_status = 'PAID'
+          and o.payment_method = 'MAYA'
+          and p.status = 'PAID'
+          and p.reference_number = 'MAYA-TEST-REFERENCE'
+          and p.metadata ->> 'payment_proof_object_path' = online_proof_path
+          and p.metadata ->> 'payment_source' = 'CUSTOMER_WEB_SUBMITTED_PROOF'
+     ) then
+    raise exception 'Maya proof did not create a paid Owner payment record with its reference and private object path';
+  end if;
 end;
 $$;
 
@@ -607,6 +741,10 @@ select extensions.ok(
   and not has_function_privilege('anon', 'public.create_guest_order_with_container_sources(text,jsonb,text)', 'EXECUTE')
   and not has_function_privilege('authenticated', 'public.create_guest_order_with_container_sources(text,jsonb,text)', 'EXECUTE')
   and has_function_privilege('service_role', 'public.create_guest_order_with_container_sources(text,jsonb,text)', 'EXECUTE')
+  and has_function_privilege('anon', 'public.get_public_station_account_receivable_eligibility(uuid[])', 'EXECUTE')
+  and not has_function_privilege('anon', 'public.record_guest_online_payment(uuid,text,text,text,text)', 'EXECUTE')
+  and not has_function_privilege('authenticated', 'public.record_guest_online_payment(uuid,text,text,text,text)', 'EXECUTE')
+  and has_function_privilege('service_role', 'public.record_guest_online_payment(uuid,text,text,text,text)', 'EXECUTE')
   and not has_function_privilege('anon', 'app_private.get_or_create_guest_station_customer(uuid,text,text)', 'EXECUTE')
   and not has_function_privilege('authenticated', 'app_private.get_or_create_guest_station_customer(uuid,text,text)', 'EXECUTE')
   and has_function_privilege('service_role', 'app_private.get_or_create_guest_station_customer(uuid,text,text)', 'EXECUTE')
@@ -625,7 +763,7 @@ select extensions.ok(
       and p.proname in (
         'validate_order_insert_context', 'consume_guest_rate', 'consume_guest_order_rate_limit',
         'consume_guest_tracking_rate_limit', 'create_order_internal', 'create_guest_order', 'create_guest_order_with_container_sources', 'resume_guest_order',
-        'get_guest_order_status'
+        'get_guest_order_status', 'record_guest_online_payment'
       )
       and p.prosecdef
       and not exists (

@@ -42,6 +42,21 @@ data class SupabaseSubscriptionRow(
 private data class SupabasePlanRow(val id: String, val code: String)
 
 @Serializable
+data class SupabaseSubscriptionHistoryRow(
+    val id: String,
+    @SerialName("organization_id") val organizationId: String,
+    @SerialName("subscription_id") val subscriptionId: String? = null,
+    @SerialName("previous_plan_id") val previousPlanId: String? = null,
+    @SerialName("new_plan_id") val newPlanId: String? = null,
+    @SerialName("event_type") val eventType: String,
+    @SerialName("effective_at") val effectiveAt: Long,
+    @SerialName("previous_status") val previousStatus: String? = null,
+    @SerialName("new_status") val newStatus: String? = null,
+    val notes: String? = null,
+    @SerialName("created_at") val createdAt: String
+)
+
+@Serializable
 private data class StationIdRow(val id: String)
 
 @Serializable
@@ -174,6 +189,25 @@ class SupabaseSubscriptionDataSource {
             }
         }.decodeList<StationIdRow>().map { it.id }.toSet()
 
+    suspend fun history(organizationId: String): List<SupabaseSubscriptionHistoryRow> = buildList {
+        var offset = 0L
+        while (true) {
+            val page = supabase.from("subscription_history").select {
+                filter { eq("organization_id", organizationId) }
+                order("effective_at", io.github.jan.supabase.postgrest.query.Order.ASCENDING)
+                order("id", io.github.jan.supabase.postgrest.query.Order.ASCENDING)
+                range(offset, offset + HISTORY_PAGE_SIZE - 1)
+            }.decodeList<SupabaseSubscriptionHistoryRow>()
+            addAll(page)
+            if (page.size < HISTORY_PAGE_SIZE) break
+            offset += HISTORY_PAGE_SIZE
+        }
+    }
+
+    suspend fun planCodes(): Map<String, String> =
+        supabase.from("subscription_plans").select().decodeList<SupabasePlanRow>()
+            .associate { it.id to it.code }
+
     private suspend fun currentForOrganization(organizationId: String?): SupabaseSubscriptionRow? {
         if (organizationId == null) return null
         return supabase.from("subscriptions").select {
@@ -246,6 +280,10 @@ class SupabaseSubscriptionDataSource {
 
     @Serializable
     private data class TrialEligibilityResponse(@SerialName("trial_consumed") val trialConsumed: Boolean)
+
+    private companion object {
+        const val HISTORY_PAGE_SIZE = 250L
+    }
 }
 
 data class RemoteDocument(

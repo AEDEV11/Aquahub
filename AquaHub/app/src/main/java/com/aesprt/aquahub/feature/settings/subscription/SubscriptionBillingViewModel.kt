@@ -7,6 +7,8 @@ import com.aesprt.aquahub.domain.model.*
 import com.aesprt.aquahub.domain.usecase.auth.ObserveCurrentOwnerUseCase
 import com.aesprt.aquahub.domain.usecase.subscription.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -42,6 +44,7 @@ class SubscriptionBillingViewModel(
 
     private val _uiState = MutableStateFlow(SubscriptionBillingUiState())
     val uiState: StateFlow<SubscriptionBillingUiState> = _uiState.asStateFlow()
+    private var playReturnRefresh: Job? = null
 
     init {
         viewModelScope.launch {
@@ -88,34 +91,48 @@ class SubscriptionBillingViewModel(
                             stationId = stationId,
                             currentSubscription = null,
                             currentPlan = null,
-                            history = emptyList()
+                            history = emptyList(),
+                            errorMessage = null
                         )
                     }
-                    refreshSubscriptionStateUseCase(stationId)
                     loadSubscriptionData(stationId)
                 }
         }
     }
 
     private suspend fun loadSubscriptionData(stationId: Long) {
-        val plans = getAvailablePlansUseCase()
-        val history = getSubscriptionHistoryUseCase(stationId)
-        _uiState.update { it.copy(availablePlans = plans, history = history) }
+        try {
+            refreshSubscriptionStateUseCase(stationId)
+            val plans = getAvailablePlansUseCase()
+            val history = getSubscriptionHistoryUseCase(stationId)
+            _uiState.update { it.copy(availablePlans = plans, history = history) }
 
-        observeCurrentSubscriptionUseCase(stationId).collectLatest { sub ->
-            val plan = plans.find { it.id == sub?.planId }
-            val state = getSubscriptionStatusUseCase(sub)
-            val remaining = getSubscriptionRemainingDaysUseCase(sub)
-            val updatedHistory = getSubscriptionHistoryUseCase(stationId)
+            // Keep HTTP history reads outside this Room observer. A new
+            // entitlement snapshot must not cancel an in-flight HTTP response
+            // or start another history request for every Room invalidation.
+            observeCurrentSubscriptionUseCase(stationId).collect { sub ->
+                val plan = plans.find { it.id == sub?.planId }
+                val state = getSubscriptionStatusUseCase(sub)
+                val remaining = getSubscriptionRemainingDaysUseCase(sub)
 
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        currentSubscription = sub,
+                        currentPlan = plan,
+                        resolvedState = state,
+                        remainingDays = remaining,
+                        errorMessage = null
+                    )
+                }
+            }
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    currentSubscription = sub,
-                    currentPlan = plan,
-                    resolvedState = state,
-                    remainingDays = remaining,
-                    history = updatedHistory
+                    errorMessage = "Could not load subscription history. Check your connection and retry."
                 )
             }
         }
@@ -201,14 +218,29 @@ class SubscriptionBillingViewModel(
     }
 
     fun refreshAfterPlayReturn() {
-        googlePlayBillingRepository.connect()
+        if (playReturnRefresh?.isActive == true) return
         val stationId = _uiState.value.stationId
         if (stationId <= 0L) return
-        viewModelScope.launch {
+        playReturnRefresh = viewModelScope.launch {
             _uiState.update { it.copy(isActionLoading = true) }
             try {
+                googlePlayBillingRepository.connect()
                 refreshSubscriptionStateUseCase(stationId)
+                val history = getSubscriptionHistoryUseCase(stationId)
+                _uiState.update {
+                    if (it.stationId == stationId) it.copy(history = history, errorMessage = null) else it
+                }
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (_: Exception) {
+                _uiState.update {
+                    if (it.stationId == stationId) it.copy(
+                        errorMessage = "Could not refresh your subscription. Check your connection and try again."
+                    ) else it
+                }
             } finally {
+                // There is only one return refresh at a time. Always finish
+                // its spinner, including when the owner changed stations.
                 _uiState.update { it.copy(isActionLoading = false) }
             }
         }

@@ -434,6 +434,12 @@ entrypoint = "./functions/guest-order/index.ts"
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/guest-order/*.html" ]
 
+[functions.guest-payment-proof]
+enabled = true
+# Guest proof submissions authenticate with the order's tracking capability token.
+verify_jwt = false
+entrypoint = "./functions/guest-payment-proof/index.ts"
+
 [functions.newsletter-subscribe]
 enabled = true
 # Public, consent-gated website endpoint. It validates origin, input and rate limits itself.
@@ -448,6 +454,11 @@ verify_jwt = false
 enabled = true
 # Internal scheduled reconciliation endpoint authenticates with MARKETING_DISPATCH_SECRET.
 verify_jwt = false
+
+# Offline grants and reconciliation require a signed-in AquaHub owner/staff JWT.
+[functions.offline-pos]
+enabled = true
+verify_jwt = true
 
 # Pub/Sub supplies a Google OIDC bearer token, not a Supabase user JWT.
 # The function validates its signature, issuer, audience, expiry, and service

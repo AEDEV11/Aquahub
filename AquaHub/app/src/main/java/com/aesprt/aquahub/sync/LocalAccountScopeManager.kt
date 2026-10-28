@@ -55,6 +55,11 @@ internal enum class AccountScopeAction {
 internal fun shouldClearLocalAccountCacheAfterLogout(outstandingWork: Int): Boolean =
     outstandingWork == 0
 
+internal fun countOutstandingLocalOperations(syncOperations: Int, offlinePosOperations: Int): Int =
+    (syncOperations.coerceAtLeast(0).toLong() + offlinePosOperations.coerceAtLeast(0).toLong())
+        .coerceAtMost(Int.MAX_VALUE.toLong())
+        .toInt()
+
 /**
  * A legacy Firebase-owned Room cache may be rebound only when the currently
  * authenticated Supabase profile explicitly maps to that exact local identity.

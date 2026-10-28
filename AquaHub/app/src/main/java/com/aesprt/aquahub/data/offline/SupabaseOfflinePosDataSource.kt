@@ -1,5 +1,6 @@
 package com.aesprt.aquahub.data.offline
 
+import com.aesprt.aquahub.core.config.ReleaseFeatureFlags
 import com.aesprt.aquahub.data.supabase.SupabaseClientProvider
 import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.postgrest.from
@@ -26,7 +27,9 @@ data class OfflinePosCommitResponse(
     val duplicate: Boolean = false
 )
 
-class SupabaseOfflinePosDataSource {
+class SupabaseOfflinePosDataSource(
+    private val offlinePosEnabled: Boolean = ReleaseFeatureFlags.offlinePosEnabled,
+) {
     private val supabase get() = SupabaseClientProvider.client
 
     suspend fun getStationOrganizationId(stationId: String): String? = supabase.from("stations").select {
@@ -46,7 +49,9 @@ class SupabaseOfflinePosDataSource {
         bootCount: Int,
         grantDurationHours: Int = 8,
         leaseDurationHours: Int = 8
-    ): OfflinePosAuthorizationResponse = supabase.functions.invoke(
+    ): OfflinePosAuthorizationResponse {
+        check(offlinePosEnabled) { ReleaseFeatureFlags.OFFLINE_POS_DISABLED_MESSAGE }
+        return supabase.functions.invoke(
         function = "offline-pos",
         body = buildJsonObject {
             put("action", "authorize")
@@ -70,7 +75,8 @@ class SupabaseOfflinePosDataSource {
                 }
             })
         }
-    ).body()
+        ).body()
+    }
 
     suspend fun commit(
         deviceId: String,
@@ -79,7 +85,9 @@ class SupabaseOfflinePosDataSource {
         canonicalPayload: String,
         payloadDigest: String,
         deviceSignature: String
-    ): OfflinePosCommitResponse = supabase.functions.invoke(
+    ): OfflinePosCommitResponse {
+        check(offlinePosEnabled) { ReleaseFeatureFlags.OFFLINE_POS_RECOVERY_MESSAGE }
+        return supabase.functions.invoke(
         function = "offline-pos",
         body = buildJsonObject {
             put("action", "commit")
@@ -90,7 +98,8 @@ class SupabaseOfflinePosDataSource {
             put("payload_digest", payloadDigest)
             put("device_signature", deviceSignature)
         }
-    ).body()
+        ).body()
+    }
 }
 
 @Serializable

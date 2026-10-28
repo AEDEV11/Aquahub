@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { calculateCartSubtotal, confirmedOrderingAvailability, deliveryLocationError, effectiveProductPrice, guestPaymentMethods, normalizePhilippineMobile } from "./order-rules.js";
+import { calculateCartBreakdown, calculateCartSubtotal, confirmedOrderingAvailability, deliveryLocationError, effectiveProductPrice, guestPaymentMethods, normalizePhilippineMobile } from "./order-rules.js";
 import { CONTAINER_SOURCE_OPTIONS, mergeOrderHistory, trackingProgress } from "./order-presentation.js";
 import { publicAssetUrl } from "./storage-assets.js";
 import { openGoogleLocationPicker } from "./google-location-picker.js";
@@ -17,6 +17,7 @@ const TRACK_KEY = `aquahub-guest-track:${stationCode}`;
 const ORDERS_KEY = `aquahub-guest-orders:${stationCode}`;
 const PROFILE_KEY = `aquahub-guest-profile:${stationCode}`;
 const ATTEMPT_KEY = `aquahub-guest-attempt:${stationCode}`;
+const MAX_PAYMENT_PROOF_BYTES = 5 * 1024 * 1024;
 const state = {
   loading: true,
   station: null,
@@ -236,6 +237,15 @@ async function loadOrderingAvailability(stationId) {
   return confirmedOrderingAvailability(stationId, data);
 }
 
+async function loadAccountBalanceAvailability(stationId) {
+  const { data, error } = await supabase.rpc("get_public_station_account_receivable_eligibility", {
+    p_station_ids: [stationId],
+  });
+  if (error) return false;
+  return Array.isArray(data) && data.some((row) =>
+    row?.station_id === stationId && row.is_account_balance_available === true);
+}
+
 async function load() {
   state.loading = true;
   state.notice = "";
@@ -258,6 +268,7 @@ async function load() {
     if (stationError) throw stationError;
     if (!stationRow) throw new Error("This station link is no longer available.");
     const orderingAvailable = await loadOrderingAvailability(stationRow.station_id);
+    const accountBalanceAvailable = await loadAccountBalanceAvailability(stationRow.station_id);
     const { data: productRows, error: productError } = await supabase.from("public_products")
       .select("*").eq("station_id", stationRow.station_id)
       .eq("is_available_for_ordering", true).order("name");
@@ -286,6 +297,7 @@ async function load() {
       mayaPaymentEnabled: Boolean(stationRow.maya_payment_enabled),
       mayaAccountName: stationRow.maya_account_name || "",
       mayaAccountNumber: stationRow.maya_account_number || "",
+      accountBalanceEnabled: accountBalanceAvailable,
     };
     state.products = (productRows || []).map((row) => ({
       id: row.product_id,
@@ -329,6 +341,7 @@ function emptyCheckout() {
     placeId: saved.placeId || "", latitude: saved.latitude ?? null, longitude: saved.longitude ?? null,
     locationLabel: saved.locationLabel || "", paymentMethod: "",
     note: "", acceptedRules: false, rememberDetails: true,
+    paymentReference: "", paymentProofFile: null,
   };
 }
 
@@ -539,6 +552,19 @@ function renderDeliveryFields(form, radiusNeedsLocation) {
   return `<div class="delivery-fields"><label class="field">Delivery address<textarea data-checkout="address" data-focus="checkout-address" name="address" rows="2" maxlength="400" autocomplete="street-address" required ${selected ? "readonly" : ""} placeholder="Search and choose your delivery address, or enter it manually">${escapeHtml(form.address)}</textarea><small>${selected ? "This address is tied to the selected map location." : "Include your house number, street, barangay and city."}</small></label><label class="field">House, unit or building details <span class="optional">Optional</span><input data-checkout="addressDetails" data-focus="checkout-address-details" name="addressDetails" value="${escapeHtml(form.addressDetails)}" maxlength="160" autocomplete="address-line2" placeholder="e.g. Unit 3B, blue gate" /></label><label class="field">Nearby landmark <span class="optional">Optional</span><input data-checkout="landmark" data-focus="checkout-landmark" name="landmark" value="${escapeHtml(form.landmark)}" maxlength="100" placeholder="e.g. across the public market" /></label><div class="location-picker ${selected ? "located" : ""}"><div class="location-icon">${icon("pin", 20)}</div><div><strong>${selected ? "Delivery pin confirmed" : radiusNeedsLocation ? "Choose your delivery location" : "Add a map location"}</strong><small>${escapeHtml(form.locationLabel || (radiusNeedsLocation ? `A map pin is required to check this station’s ${state.station.deliveryRadiusKm} km delivery area.` : "Optional for this station; a pin helps confirm the destination."))}</small></div><button type="button" class="button secondary location-button" data-action="open-location-picker">${selected ? "Change pin" : "Find address & pin"}</button></div>${!GOOGLE_MAPS_BROWSER_KEY ? `<p class="inline-help">Map search is not configured in this build. Delivery stations that require a pin cannot accept delivery until it is available.</p>` : ""}</div>`;
 }
 
+function renderOnlinePaymentFields(form) {
+  const method = form.paymentMethod;
+  if (!['GCASH', 'MAYA'].includes(method)) return "";
+  const provider = method === "GCASH" ? "GCash" : "Maya";
+  const accountName = method === "GCASH" ? state.station.gcashAccountName : state.station.mayaAccountName;
+  const accountNumber = method === "GCASH" ? state.station.gcashAccountNumber : state.station.mayaAccountNumber;
+  const account = [accountName, accountNumber].filter(Boolean).join(" · ");
+  const file = form.paymentProofFile;
+  const paymentTotal = calculateCartBreakdown(cartLines()).discountedSubtotal
+    + (form.mode === "DELIVERY" ? state.station.deliveryFeeCentavos : 0);
+  return `<div class="online-payment-fields"><div class="online-payment-instructions"><strong>Pay ${formatMoney(paymentTotal)} to ${escapeHtml(account || `the station’s ${provider} account`)}.</strong><small>Enter the payment reference and attach a screenshot of your completed ${provider} payment. The station will receive this order as paid.</small></div><label class="field">${provider} reference number<input data-checkout="paymentReference" data-focus="payment-reference" name="paymentReference" value="${escapeHtml(form.paymentReference || "")}" maxlength="100" autocomplete="off" required placeholder="Enter the reference from your receipt" /></label><label class="field">Payment screenshot<input data-focus="payment-proof" name="paymentProof" type="file" accept="image/jpeg,image/png,image/webp" ${file ? "" : "required"} /><small>JPG, PNG or WebP, up to 5 MB.</small></label>${file ? `<div class="selected-proof"><span>${escapeHtml(file.name)} · ${(file.size / 1024 / 1024).toFixed(1)} MB</span><button type="button" data-action="remove-payment-proof">Remove</button></div>` : ""}</div>`;
+}
+
 function renderCheckout() {
   const form = state.checkout || emptyCheckout();
   const delivery = form.mode === "DELIVERY";
@@ -547,15 +573,17 @@ function renderCheckout() {
   const paymentOptions = availablePayments(form.mode);
   const radiusNeedsLocation = delivery && state.station.deliveryRadiusKm > 0;
   const rules = state.station.rules.trim();
-  const total = cartSubtotal() + (delivery ? state.station.deliveryFeeCentavos : 0);
+  const lines = cartLines();
+  const priceBreakdown = calculateCartBreakdown(lines);
+  const total = priceBreakdown.discountedSubtotal + (delivery ? state.station.deliveryFeeCentavos : 0);
   return `<main class="page checkout-page"><button class="back-link" data-action="back-catalog">${icon("arrow", 17)} Back to products</button><div class="checkout-heading"><p class="eyebrow">ALMOST THERE</p><h1>Checkout</h1><p>Place your order as a guest. No account or password needed.</p></div><div class="checkout-layout"><form id="order-form" class="checkout-form" novalidate>
       <section class="checkout-card"><div class="step-heading"><span class="step-number">1</span><div><h2>Your details</h2><p>We’ll use these to confirm your order.</p></div></div><label class="profile-remember"><input data-checkout="rememberDetails" data-focus="remember-details" type="checkbox" name="rememberDetails" ${form.rememberDetails ? "checked" : ""} />${icon("shield", 14)} <span>Remember contact and delivery details on this device</span></label>${profileSaved ? `<p class="profile-saved-note">Your details are saved here. <button type="button" data-action="clear-profile">Clear saved details</button></p>` : `<p class="profile-save-note">Details are saved after a successful order and can be cleared at any time.</p>`}<div class="form-grid"><label class="field full">Full name<input data-checkout="name" data-focus="checkout-name" name="name" value="${escapeHtml(form.name)}" autocomplete="name" maxlength="100" required placeholder="e.g. Alex Santos" /></label><label class="field full">Philippine mobile number<span class="input-with-prefix"><span>+63</span><input data-checkout="phone" data-focus="checkout-phone" name="phone" value="${escapeHtml(form.phone)}" autocomplete="tel-national" inputmode="tel" maxlength="16" required placeholder="9XX XXX XXXX" /></span><small id="phone-help">Enter your 10-digit mobile number after +63.</small></label></div></section>
       <section class="checkout-card"><div class="step-heading"><span class="step-number">2</span><div><h2>How should we get it to you?</h2><p>Fulfilment options are set by ${escapeHtml(state.station.name)}.</p></div></div><div class="fulfilment-options"><label class="fulfilment-option ${!delivery ? "selected" : ""}"><input type="radio" name="mode" value="PICKUP" ${!delivery ? "checked" : ""} /><span class="fulfilment-icon">${icon("bag", 20)}</span><span><strong>Pick up</strong><small>Collect from the station</small></span></label><label class="fulfilment-option ${delivery ? "selected" : ""}"><input type="radio" name="mode" value="DELIVERY" ${delivery ? "checked" : ""} /><span class="fulfilment-icon">${icon("pin", 20)}</span><span><strong>Delivery</strong><small>${state.station.deliveryRadiusKm > 0 ? `Within ${state.station.deliveryRadiusKm} km` : "To your address"}</small></span></label></div>${delivery ? renderDeliveryFields(form, radiusNeedsLocation) : `<div class="pickup-note">${icon("pin", 18)} <span>Pickup at <strong>${escapeHtml(state.station.address || state.station.name)}</strong></span></div>`}</section>
-      <section class="checkout-card"><div class="step-heading"><span class="step-number">3</span><div><h2>Payment</h2><p>Select a method this station currently accepts.</p></div></div>${paymentOptions.length ? `<fieldset class="payment-options"><legend class="sr-only">Payment method</legend>${paymentOptions.map((option) => `<label class="payment-option ${form.paymentMethod === option.value ? "selected" : ""}"><input type="radio" name="paymentMethod" value="${option.value}" ${form.paymentMethod === option.value ? "checked" : ""} /><span class="payment-radio"></span><span><strong>${escapeHtml(option.label)}</strong><small>${escapeHtml(option.detail)}</small></span>${option.value === "GCASH" ? `<span class="payment-brand gcash">GCash</span>` : option.value === "MAYA" ? `<span class="payment-brand maya">Maya</span>` : ""}</label>`).join("")}</fieldset>` : `<div class="no-payment"><strong>No payment method is available for ${delivery ? "delivery" : "pickup"}.</strong><span>Contact the station before placing an order.</span>${state.station.phone ? `<a href="tel:${escapeHtml(state.station.phone)}">Call ${escapeHtml(state.station.phone)}</a>` : ""}</div>`}</section>
+      <section class="checkout-card"><div class="step-heading"><span class="step-number">3</span><div><h2>Payment</h2><p>Select a method this station currently accepts.</p></div></div>${paymentOptions.length ? `<fieldset class="payment-options"><legend class="sr-only">Payment method</legend>${paymentOptions.map((option) => `<label class="payment-option ${form.paymentMethod === option.value ? "selected" : ""}"><input type="radio" name="paymentMethod" value="${option.value}" ${form.paymentMethod === option.value ? "checked" : ""} /><span class="payment-radio"></span><span><strong>${escapeHtml(option.label)}</strong><small>${escapeHtml(option.detail)}</small></span>${option.value === "GCASH" ? `<span class="payment-brand gcash">GCash</span>` : option.value === "MAYA" ? `<span class="payment-brand maya">Maya</span>` : ""}</label>`).join("")}</fieldset>${renderOnlinePaymentFields(form)}</section>` : `<div class="no-payment"><strong>No payment method is available for ${delivery ? "delivery" : "pickup"}.</strong><span>Contact the station before placing an order.</span>${state.station.phone ? `<a href="tel:${escapeHtml(state.station.phone)}">Call ${escapeHtml(state.station.phone)}</a>` : ""}</div>`}</section>
       ${rules ? `<section class="checkout-card rules-card"><div class="step-heading"><span class="step-number">4</span><div><h2>Station ordering rules</h2><p>Please review before placing your order.</p></div></div><div class="rules-copy">${escapeHtml(rules).replaceAll("\n", "<br>")}</div><label class="rules-accept"><input type="checkbox" data-checkout="acceptedRules" name="acceptedRules" ${form.acceptedRules ? "checked" : ""} /><span>I’ve read and agree to these station rules.</span></label></section>` : ""}
       <section class="checkout-card note-card"><label class="field">Order note <span class="optional">Optional</span><textarea data-checkout="note" data-focus="checkout-note" name="note" rows="2" maxlength="500" placeholder="Anything the station should know?">${escapeHtml(form.note)}</textarea></label></section>
       <div class="checkout-submit"><button class="button primary submit-order" type="submit" ${state.orderBusy || !ordersAllowed() || !paymentOptions.length ? "disabled" : ""}>${state.orderBusy ? `<span class="button-spinner"></span> Sending order…` : `Place order · ${formatMoney(total)} ${icon("arrow", 18)}`}</button><p>${icon("shield", 15)} Your contact details are only shared with this station to fulfil your order.</p></div>
-    </form><aside class="checkout-summary"><div class="summary-head"><span>${icon("bag", 19)} Order summary</span><button data-action="back-catalog">Edit</button></div><div class="summary-station">${stationImage()}<div><strong>${escapeHtml(state.station.name)}</strong><small>${delivery ? "Delivery" : "Station pickup"}</small></div></div><div class="summary-lines">${cartLines().map(({ product, quantity, unitPrice, containerSource }) => `<div class="summary-line"><span>${quantity} × ${escapeHtml(product.name)}${containerSource ? `<small>${escapeHtml(containerSourceTitle(containerSource))}</small>` : ""}</span><strong>${formatMoney(unitPrice * quantity)}</strong></div>`).join("")}</div><div class="summary-calculations"><div><span>Subtotal</span><strong>${formatMoney(cartSubtotal())}</strong></div><div><span>${delivery ? "Delivery fee" : "Pickup"}</span><strong>${delivery ? state.station.deliveryFeeCentavos ? formatMoney(state.station.deliveryFeeCentavos) : "Free" : "Free"}</strong></div><div class="summary-total"><span>Total</span><strong>${formatMoney(total)}</strong></div></div><div class="summary-assurance">${icon("shield", 16)}<span>Final price and stock are checked securely by the station system.</span></div></aside></div></main>`;
+    </form><aside class="checkout-summary"><div class="summary-head"><span>${icon("bag", 19)} Order summary</span><button data-action="back-catalog">Edit</button></div><div class="summary-station">${stationImage()}<div><strong>${escapeHtml(state.station.name)}</strong><small>${delivery ? "Delivery" : "Station pickup"}</small></div></div><div class="summary-lines">${lines.map(({ product, quantity, unitPrice, containerSource }) => { const regular = product.priceCentavos * quantity; const discounted = unitPrice * quantity; return `<div class="summary-line"><span>${quantity} × ${escapeHtml(product.name)}${containerSource ? `<small>${escapeHtml(containerSourceTitle(containerSource))}</small>` : ""}</span><strong>${regular > discounted ? `<del>${formatMoney(regular)}</del>` : ""}${formatMoney(discounted)}</strong></div>`; }).join("")}</div><div class="summary-calculations">${priceBreakdown.discountCentavos ? `<div><span>Regular subtotal</span><strong>${formatMoney(priceBreakdown.regularSubtotal)}</strong></div><div class="summary-promotion"><span>Promotion discount</span><strong>−${formatMoney(priceBreakdown.discountCentavos)}</strong></div><div><span>Discounted subtotal</span><strong>${formatMoney(priceBreakdown.discountedSubtotal)}</strong></div>` : `<div><span>Subtotal</span><strong>${formatMoney(priceBreakdown.discountedSubtotal)}</strong></div>`}<div><span>${delivery ? "Delivery fee" : "Pickup"}</span><strong>${delivery ? state.station.deliveryFeeCentavos ? formatMoney(state.station.deliveryFeeCentavos) : "Free" : "Free"}</strong></div><div class="summary-total"><span>Total</span><strong>${formatMoney(total)}</strong></div></div><div class="summary-assurance">${icon("shield", 16)}<span>Final price and stock are checked securely by the station system.</span></div></aside></div></main>`;
 }
 
 function friendlyStatus(status) {
@@ -647,6 +675,9 @@ function captureCheckout(form) {
   state.checkout.addressDetails = String(data.get("addressDetails") || "").trim();
   state.checkout.landmark = String(data.get("landmark") || "").trim();
   state.checkout.paymentMethod = String(data.get("paymentMethod") || "");
+  state.checkout.paymentReference = String(data.get("paymentReference") || "").trim();
+  const proofFile = data.get("paymentProof");
+  if (proofFile instanceof File && proofFile.size > 0) state.checkout.paymentProofFile = proofFile;
   state.checkout.note = String(data.get("note") || "").trim();
   state.checkout.acceptedRules = data.has("acceptedRules");
   state.checkout.rememberDetails = data.has("rememberDetails");
@@ -662,6 +693,16 @@ function orderPayload() {
   if (checkout.name.length > 100) throw new Error("Your name is too long.");
   if (!phone) throw new Error("Enter a valid Philippine mobile number, such as 09XX XXX XXXX.");
   if (!payment) throw new Error("Choose a payment method this station currently accepts.");
+  if (["GCASH", "MAYA"].includes(checkout.paymentMethod)) {
+    if (!checkout.paymentReference || checkout.paymentReference.length > 100 || /[\u0000-\u001f\u007f]/.test(checkout.paymentReference)) {
+      throw new Error("Enter the reference number from your payment receipt.");
+    }
+    const proof = checkout.paymentProofFile;
+    if (!(proof instanceof File) || proof.size < 1 || proof.size > MAX_PAYMENT_PROOF_BYTES
+      || !["image/jpeg", "image/png", "image/webp"].includes(proof.type)) {
+      throw new Error("Attach a JPG, PNG or WebP payment screenshot up to 5 MB.");
+    }
+  }
   const locationError = deliveryLocationError({
     mode: checkout.mode,
     radiusKm: state.station.deliveryRadiusKm,
@@ -742,6 +783,23 @@ async function submitGuestOrder(form) {
     if (data?.error) throw new Error(data.error);
     const result = data?.order;
     if (!result?.order_id || !result?.order_number) throw new Error("We couldn’t confirm the order. Your details are still here; please try again.");
+    if (["GCASH", "MAYA"].includes(request.payment_method)) {
+      const proofForm = new FormData();
+      proofForm.set("orderId", result.order_id);
+      proofForm.set("trackingToken", state.orderAttempt.trackingToken);
+      proofForm.set("paymentMethod", request.payment_method);
+      proofForm.set("referenceNumber", state.checkout.paymentReference);
+      proofForm.set("proof", state.checkout.paymentProofFile, state.checkout.paymentProofFile.name);
+      const { data: proofData, error: proofError } = await supabase.functions.invoke("guest-payment-proof", { body: proofForm });
+      if (proofError || proofData?.error) {
+        let message = proofData?.error || "Your order was received, but the payment proof could not be sent. Keep this page open and try again.";
+        try {
+          const response = proofError?.context instanceof Response ? await proofError.context.clone().json() : null;
+          if (response?.error) message = response.error;
+        } catch { /* Preserve the recoverable receipt message. */ }
+        throw new Error(message);
+      }
+    }
     state.order = {
       id: result.order_id,
       token: state.orderAttempt.trackingToken,
@@ -871,6 +929,10 @@ app?.addEventListener("click", (event) => {
     state.noticeKind = "info";
     render();
   }
+  if (action === "remove-payment-proof") {
+    if (state.checkout) state.checkout.paymentProofFile = null;
+    render();
+  }
   if (action === "open-location-picker") chooseDeliveryLocation();
   if (action === "retry-load") load();
   if (action === "refresh-tracking") refreshOrderStatus();
@@ -902,6 +964,9 @@ app?.addEventListener("change", (event) => {
     render();
   } else if (target.name === "paymentMethod") {
     state.checkout.paymentMethod = target.value;
+    render();
+  } else if (target.name === "paymentProof") {
+    state.checkout.paymentProofFile = target.files?.[0] || null;
     render();
   } else if (target.matches("[data-checkout='acceptedRules']")) {
     state.checkout.acceptedRules = target.checked;

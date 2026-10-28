@@ -17,6 +17,7 @@ import com.aesprt.aquahub.data.supabase.order.SupabaseOrderDataSource
 import com.aesprt.aquahub.data.supabase.payment.SupabasePaymentDataSource
 import com.aesprt.aquahub.domain.repository.PaymentCache
 import com.aesprt.aquahub.domain.repository.OfflinePosRepository
+import com.aesprt.aquahub.core.config.ReleaseFeatureFlags
 import com.aesprt.aquahub.domain.model.OfflineCashSaleRequest
 import com.aesprt.aquahub.domain.model.OfflinePosReservationItem
 import com.aesprt.aquahub.sync.ConnectivityMonitor
@@ -227,7 +228,8 @@ class CreateWalkInOrderUseCase(
     /** Only unit tests may opt into the legacy local calculation path. */
     private val allowLocalTestPath: Boolean = false,
     private val offlinePosRepository: OfflinePosRepository? = null,
-    private val connectivityMonitor: ConnectivityMonitor? = null
+    private val connectivityMonitor: ConnectivityMonitor? = null,
+    private val offlinePosEnabled: Boolean = ReleaseFeatureFlags.offlinePosEnabled,
 ) {
     suspend operator fun invoke(
         stationId: Long = 1,
@@ -305,6 +307,9 @@ class CreateWalkInOrderUseCase(
         // Room catalog/stock may have changed while disconnected, so do not
         // reprice or reject a leased line from the mutable catalog cache.
         if (connectivityMonitor?.isCurrentlyOnline() == false) {
+            if (!offlinePosEnabled) {
+                return@run Result.failure(IllegalStateException(ReleaseFeatureFlags.OFFLINE_POS_DISABLED_MESSAGE))
+            }
             if (offlinePosRepository == null || normalizedDeliveryMode != "PICKUP" ||
                 chargeToAccount || paymentMethod != com.aesprt.aquahub.domain.model.PaymentMethod.CASH ||
                 emptyBottlesReturned != 0 || stationContainersIssued != 0

@@ -2,14 +2,14 @@
 
 ## Release decision
 
-**NO-GO for production release.** Firebase Hosting remains the frontend host. Supabase remains the database, Storage provider, and guest-order backend. No Firebase Hosting deploy, Supabase Edge Function deploy, hosted migration, remote configuration change, or secret update has been performed or is authorized by this local validation task.
+**Production release completed 2026-10-18 by direct owner authorization.** Firebase Hosting site `aquahub-506411` now serves the production ordering build. Supabase project `pfkxrggexueltytxtqil` has the quantity-break percentage fix and subscription-history read policy applied. The release skipped isolated staging because no staging environment was provisioned; the end-to-end checks below remain outstanding and must be completed before treating the entire web-ordering flow as fully validated.
 
 For the read-only environment inventory, isolated staging preparation, exact
 CLI commands, gateway-IP test, Owner App test build method, and complete
 end-to-end runbook, see
 [`AQUAHUB_STAGING_RUNBOOK.md`](AQUAHUB_STAGING_RUNBOOK.md).
 
-The Firebase project recorded in aquahub-website/.firebaserc is aquahub-506411. That value is a configured project target, not proof that it is staging. Do not use it for preview deployment until the owner confirms the exact site and environment.
+The Firebase project recorded in aquahub-website/.firebaserc is `aquahub-506411`, the production site used for this explicitly authorized release. It is not a staging project.
 
 ## Architecture and local build
 
@@ -113,4 +113,4 @@ Production is **GO** only after separate explicit approvals for Firebase Hosting
 - Responsive checkout, address search/map pin, permission-denial fallback, and accessibility checks pass on supported browsers.
 - Monitoring, backup/recovery, rollback owners, and release sequencing are ready.
 
-Until these gates and approvals are met, frontend and backend status remains **NO-GO**. No hosted configuration or data was changed during local validation.
+The owner explicitly authorized the 2026-10-18 direct production release. Firebase Hosting publication and the two Supabase migrations are complete. The staging, Maps-provider, gateway-IP, and Owner-device checks above remain incomplete, so full cross-system acceptance is still **PARTIAL**. No additional release should be inferred from this deployment record.

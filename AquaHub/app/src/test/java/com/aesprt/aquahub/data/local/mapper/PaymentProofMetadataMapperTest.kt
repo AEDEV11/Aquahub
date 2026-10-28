@@ -19,6 +19,14 @@ class PaymentProofMetadataMapperTest {
     }
 
     @Test
+    fun `customer online payment proof uses generic metadata path`() {
+        val path = "organizations/org/stations/station/customer-payment-proofs/order/proof.jpg"
+        val payment = payment(metadataJson = """{"payment_proof_object_path":"$path"}""").toDomain()
+
+        assertEquals(path, payment.deliveryPaymentProofObjectPath)
+    }
+
+    @Test
     fun `missing or malformed payment metadata does not break payment history`() {
         assertNull(payment(metadataJson = null).toDomain().deliveryPaymentProofObjectPath)
         assertNull(payment(metadataJson = "not-json").toDomain().deliveryPaymentProofObjectPath)

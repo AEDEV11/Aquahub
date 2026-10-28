@@ -30,6 +30,7 @@ class WalkInInventoryTest {
         allowLocalTestPath: Boolean = true,
         offlinePosRepository: OfflinePosRepository? = null,
         online: Boolean? = null,
+        offlinePosEnabled: Boolean = true,
     ): CreateWalkInOrderUseCase {
         val time = FakeTestTimeProvider(100)
         val plans = FakeTestSubscriptionPlanRepository()
@@ -92,6 +93,7 @@ class WalkInInventoryTest {
             allowLocalTestPath = allowLocalTestPath,
             offlinePosRepository = offlinePosRepository,
             connectivityMonitor = connectivity,
+            offlinePosEnabled = offlinePosEnabled,
         )
     }
 
@@ -117,6 +119,34 @@ class WalkInInventoryTest {
         assertEquals(99L, result.getOrThrow())
         assertEquals(listOf(OfflinePosReservationItem(productLocalId = 1L, quantity = 2)), request?.items)
         assertNull(request?.cashReceivedCentavos)
+        assertEquals(0, ordersCreated)
+        assertEquals(0, paymentsRecorded)
+    }
+
+    @Test
+    fun onlineOnlyReleaseDoesNotCreateOfflineSaleWhenConnectivityIsLost() = runTest {
+        var offlineRecordCalls = 0
+        val offline = fake<OfflinePosRepository> { name, _ -> when (name) {
+            "recordCashSale" -> { offlineRecordCalls++; 99L }
+            else -> error(name)
+        } }
+
+        val result = useCase(
+            allowLocalTestPath = false,
+            offlinePosRepository = offline,
+            online = false,
+            offlinePosEnabled = false,
+        )(
+            stationId = 1,
+            customerName = "Walk-in",
+            items = listOf(item),
+            containerSize = "5 Gallon",
+        )
+
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull()?.message.orEmpty().contains("unavailable in this release"))
+        assertEquals(0, offlineRecordCalls)
+        assertEquals(10, stock)
         assertEquals(0, ordersCreated)
         assertEquals(0, paymentsRecorded)
     }

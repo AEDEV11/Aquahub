@@ -44,8 +44,6 @@ import com.aesprt.aquahub.feature.sync.SyncStatusViewModel
 import com.aesprt.aquahub.sync.SyncUiState
 import com.aesprt.aquahub.ui.theme.*
 import org.koin.androidx.compose.koinViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 sealed class BottomNavItem(val route: String, val label: String, val icon: ImageVector) {
     data object Dashboard : BottomNavItem(Screen.Dashboard.route, "Home", Icons.Rounded.Home)
@@ -95,8 +93,22 @@ fun MainContainerScreen(
 
     var isFabExpanded by remember { mutableStateOf(false) }
     var showWalkInSaleSheet by remember { mutableStateOf(false) }
-    var isRefreshing by remember { mutableStateOf(false) }
-    val refreshScope = rememberCoroutineScope()
+    val isRefreshing = syncState == SyncUiState.Syncing
+    val mainGateLoading = remember { mutableStateMapOf<String, Boolean>() }
+    val currentGateKey = when {
+        currentRoute == Screen.Dashboard.route -> "dashboard"
+        currentRoute?.startsWith("orders") == true -> "orders"
+        currentRoute == Screen.Inventory.route -> "inventory"
+        currentRoute == Screen.Customers.route -> "customers"
+        else -> null
+    }
+    // Keep quick actions unavailable until the current tab's access gate has
+    // settled. Otherwise a walk-in sale can mount a second full-screen gate
+    // loader over the tab's loader.
+    val isCurrentGateLoading = currentGateKey?.let { mainGateLoading[it] ?: true } ?: false
+    LaunchedEffect(isCurrentGateLoading) {
+        if (isCurrentGateLoading) isFabExpanded = false
+    }
     val fabRotation by animateFloatAsState(
         targetValue = if (isFabExpanded) 45f else 0f,
         label = "fabRotation"
@@ -145,7 +157,7 @@ fun MainContainerScreen(
                 SyncStatusBanner(syncState = syncState, onSyncNow = syncViewModel::syncNow)
             },
             floatingActionButton = {
-            if (canUseWalkInSale && currentRoute != Screen.Customers.route) {
+            if (canUseWalkInSale && currentRoute != Screen.Customers.route && !isCurrentGateLoading) {
                 if (isStaff) {
                     // Staff have one quick action only: process a walk-in sale.
                     FloatingActionButton(
@@ -231,16 +243,7 @@ fun MainContainerScreen(
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
-            onRefresh = {
-                if (!isRefreshing) {
-                    isRefreshing = true
-                    syncViewModel.syncNow()
-                    refreshScope.launch {
-                        delay(900)
-                        isRefreshing = false
-                    }
-                }
-            },
+            onRefresh = syncViewModel::syncNow,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = innerPadding.calculateBottomPadding())
@@ -255,7 +258,11 @@ fun MainContainerScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             composable(Screen.Dashboard.route) {
-                SubscriptionGate(SubscriptionFeature.DASHBOARD, { rootNavController.navigate(Screen.SubscriptionBilling.route) }) {
+                SubscriptionGate(
+                    SubscriptionFeature.DASHBOARD,
+                    { rootNavController.navigate(Screen.SubscriptionBilling.route) },
+                    onLoadingChanged = { mainGateLoading["dashboard"] = it }
+                ) {
 DashboardScreen(
                     viewModel = koinViewModel(),
                     onNavigateToOrders = { tab ->
@@ -308,7 +315,11 @@ DashboardScreen(
                 )
             ) { backStackEntry ->
                 val tab = backStackEntry.arguments?.getString("tab")
-                SubscriptionGate(SubscriptionFeature.ORDER_MANAGEMENT, { rootNavController.navigate(Screen.SubscriptionBilling.route) }) {
+                SubscriptionGate(
+                    SubscriptionFeature.ORDER_MANAGEMENT,
+                    { rootNavController.navigate(Screen.SubscriptionBilling.route) },
+                    onLoadingChanged = { mainGateLoading["orders"] = it }
+                ) {
 OrdersScreen(
                     viewModel = koinViewModel(),
                     initialTab = tab,
@@ -324,7 +335,11 @@ OrdersScreen(
             }
 
             composable(Screen.Inventory.route) {
-                SubscriptionGate(SubscriptionFeature.BASIC_INVENTORY, { rootNavController.navigate(Screen.SubscriptionBilling.route) }) {
+                SubscriptionGate(
+                    SubscriptionFeature.BASIC_INVENTORY,
+                    { rootNavController.navigate(Screen.SubscriptionBilling.route) },
+                    onLoadingChanged = { mainGateLoading["inventory"] = it }
+                ) {
                 InventoryScreen(
                     viewModel = koinViewModel(),
                     onBackClick = {
@@ -336,7 +351,11 @@ OrdersScreen(
             }
 
             composable(Screen.Customers.route) {
-                SubscriptionGate(SubscriptionFeature.CUSTOMER_MANAGEMENT, { rootNavController.navigate(Screen.SubscriptionBilling.route) }) {
+                SubscriptionGate(
+                    SubscriptionFeature.CUSTOMER_MANAGEMENT,
+                    { rootNavController.navigate(Screen.SubscriptionBilling.route) },
+                    onLoadingChanged = { mainGateLoading["customers"] = it }
+                ) {
 CustomersScreen(
                     viewModel = koinViewModel(),
                     onNavigateToCustomerDetail = { customerId ->

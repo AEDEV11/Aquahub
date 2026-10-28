@@ -1,6 +1,7 @@
 package com.aesprt.aquahub.sync
 
 import androidx.room.withTransaction
+import com.aesprt.aquahub.core.config.ReleaseFeatureFlags
 import com.aesprt.aquahub.core.database.AquaHubDatabase
 import com.aesprt.aquahub.data.local.dao.OfflinePosDao
 import com.aesprt.aquahub.data.local.dao.OrderDao
@@ -24,9 +25,17 @@ class OfflinePosSyncCoordinator(
     private val syncDao: SyncDao,
     private val remote: SupabaseOfflinePosDataSource,
     private val paymentRemote: SupabasePaymentDataSource,
-    private val cryptography: OfflinePosCryptography = OfflinePosCryptography()
+    private val cryptography: OfflinePosCryptography = OfflinePosCryptography(),
+    private val offlinePosEnabled: Boolean = ReleaseFeatureFlags.offlinePosEnabled,
 ) {
     suspend fun syncPending(): Boolean {
+        if (!offlinePosEnabled) {
+            // Preserve unresolved local receipts for manual recovery. In the
+            // online-only build, never turn an offline cash record into a
+            // server order or payment automatically.
+            offlinePosDao.recoverInterruptedOperations(System.currentTimeMillis())
+            return false
+        }
         val profileUid = SupabaseClientProvider.client.auth.currentUserOrNull()?.id ?: return false
         val now = System.currentTimeMillis()
         offlinePosDao.recoverInterruptedOperations(now)
